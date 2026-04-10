@@ -29,80 +29,17 @@
         }
         .container { max-width: 1280px; margin: 0 auto; padding: 0 1rem; width: 100%; flex: 1; }
 
-        /* ===== NAVBAR (موحد) ===== */
+        /* ===== NAVBAR مبسطة (فقط لوجو + دارك مود) ===== */
         nav {
             position: sticky; top: 0; backdrop-filter: blur(12px); background: var(--navbar-bg);
-            border-bottom: 1px solid var(--border); z-index: 100; padding: 0.5rem 1rem;
+            border-bottom: 1px solid var(--border); z-index: 100; padding: 0.5rem 2rem;
             display: flex; align-items: center; justify-content: space-between;
         }
-        .logo-area { display: flex; align-items: center; gap: 0.3rem; }
-        .logo-area img { height: 40px; width: auto; border-radius: 8px; }
-        .logo-text h2 { font-size: 1.2rem; font-weight: 700; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .logo-area { display: flex; align-items: center; gap: 0.5rem; }
+        .logo-area img { height: 44px; width: auto; border-radius: 10px; }
+        .logo-text h2 { font-size: 1.4rem; font-weight: 700; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .logo-text span { font-size: 0.7rem; color: var(--text-secondary); display: block; }
-        .nav-links { display: flex; gap: 1.5rem; }
-        .nav-links a { text-decoration: none; color: var(--text-primary); font-weight: 500; transition: 0.2s; }
-        .nav-links a:hover, .nav-links a.active { color: var(--accent-1); }
-        .nav-right { display: flex; align-items: center; gap: 0.8rem; }
-        .nav-icon { font-size: 1.2rem; color: var(--text-primary); cursor: pointer; transition: 0.2s; }
-        .nav-icon:hover { color: var(--accent-1); }
-        .theme-toggle { background: none; border: none; color: var(--text-primary); font-size: 1.2rem; cursor: pointer; }
-        .profile-badge {
-            display: flex; align-items: center; justify-content: center; background: var(--surface);
-            border-radius: 50%; width: 40px; height: 40px; border: 1px solid var(--border);
-            cursor: pointer; text-decoration: none; color: var(--text-primary); font-weight: 600;
-        }
-        .logout-btn {
-            background: transparent; border: 1px solid var(--accent-1); color: var(--accent-1);
-            padding: 0.3rem 0.9rem; border-radius: 40px; font-weight: 600; cursor: pointer;
-        }
-        .logout-btn:hover { background: var(--accent-1); color: white; box-shadow: 0 0 15px var(--glow); }
-        .hamburger { display: none; font-size: 1.5rem; cursor: pointer; color: var(--text-primary); margin-left: 0.5rem; }
-
-        /* Sidebar */
-        .sidebar {
-            position: fixed; top: 0; left: -100%; width: 250px; height: 100vh; background: var(--surface);
-            border-right: 1px solid var(--border); padding: 2rem 1rem; transition: left 0.3s; z-index: 200;
-        }
-        .sidebar.open { left: 0; }
-        .sidebar .close-btn { text-align: right; margin-bottom: 2rem; font-size: 1.5rem; cursor: pointer; }
-        .sidebar ul { list-style: none; }
-        .sidebar li { margin-bottom: 1.2rem; }
-        .sidebar a, .sidebar button {
-            text-decoration: none; color: var(--text-primary); font-weight: 500; font-size: 1.1rem;
-            display: flex; align-items: center; gap: 0.8rem; background: none; border: none; width: 100%; cursor: pointer;
-        }
-        .sidebar a:hover, .sidebar button:hover { color: var(--accent-1); }
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 150; display: none; }
-        .overlay.active { display: block; }
-
-        /* Dropdowns */
-        .notification-wrapper, .message-wrapper { position: relative; display: inline-flex; align-items: center; }
-        .notification-badge, .message-badge { display: none; }
-        .notification-dropdown, .message-dropdown {
-            position: absolute; top: calc(100% + 8px); right: 0; width: 360px; max-width: 90vw;
-            background: var(--surface); border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            border: 1px solid var(--border); z-index: 1001; display: none; flex-direction: column; overflow: hidden;
-        }
-        .notification-dropdown.show, .message-dropdown.show { display: flex; }
-        .dropdown-header { display: flex; justify-content: space-between; padding: 1rem 1.2rem; border-bottom: 1px solid var(--border); }
-        .dropdown-header h3 { font-size: 1.1rem; }
-        .mark-read-btn { background: none; border: none; color: var(--accent-1); font-size: 0.8rem; cursor: pointer; }
-        .notifications-list, .messages-list { max-height: 320px; overflow-y: auto; }
-        .notification-item, .message-item {
-            display: flex; gap: 0.8rem; padding: 1rem 1.2rem; border-bottom: 1px solid var(--border);
-            cursor: pointer; transition: background 0.2s;
-        }
-        .notification-item:hover, .message-item:hover { background: var(--bg); }
-        .notification-icon { font-size: 1.2rem; color: var(--accent-1); }
-        .notification-content, .message-content { flex: 1; }
-        .notification-title, .message-sender { font-weight: 600; font-size: 0.9rem; }
-        .notification-desc, .message-preview { font-size: 0.8rem; color: var(--text-secondary); }
-        .notification-time, .message-time { font-size: 0.7rem; color: var(--text-secondary); margin-top: 0.2rem; }
-        .message-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--accent-1); overflow: hidden; }
-        .message-avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .dropdown-footer { padding: 0.8rem; text-align: center; border-top: 1px solid var(--border); }
-        .dropdown-footer a { color: var(--text-secondary); text-decoration: none; font-size: 0.85rem; }
-        .dropdown-footer a:hover { color: var(--accent-1); text-decoration: underline; }
+        .theme-toggle { background: none; border: none; color: var(--text-primary); font-size: 1.3rem; cursor: pointer; }
 
         /* Hero & Content */
         .about-hero {
@@ -125,7 +62,7 @@
         .mission-card:hover { transform: translateY(-6px); box-shadow: var(--shadow); border-color: var(--accent-1); }
         .mission-icon { font-size: 2.5rem; color: var(--accent-1); margin-bottom: 1rem; }
 
-        /* Phoenix Story مع الخلفية الأصلية */
+        /* Phoenix Story */
         .story-section {
             display: flex; gap: 3rem; align-items: center; margin: 4rem 0; flex-wrap: wrap;
             background: var(--surface); border-radius: 48px; padding: 2.5rem; border: 1px solid var(--border);
@@ -196,7 +133,7 @@
         .team-social { display: flex; justify-content: center; gap: 1rem; margin-top: 0.8rem; }
         .team-social a { color: var(--linkedin-blue); font-size: 1.4rem; }
 
-        /* Footer (القديم) */
+        /* Footer */
         .simple-footer {
             background: var(--footer-bg); color: var(--footer-text);
             text-align: center; padding: 2rem 1rem; margin-top: 3rem; border-radius: 30px 30px 0 0;
@@ -250,60 +187,24 @@
         .chat-input-area button { background: var(--gradient); border: none; border-radius: 40px; padding: 0 18px; color: white; cursor: pointer; }
 
         @media (max-width: 768px) {
-            .nav-links, .nav-right .theme-toggle, .nav-right .notification-wrapper, .nav-right .message-wrapper, .nav-right .profile-badge, .nav-right .logout-btn { display: none; }
-            .hamburger { display: block; }
             .magic-logo { width: 120px; }
             .story-section { padding: 1.5rem; }
-        }
-        @media (min-width: 769px) {
-            .hamburger { display: none; }
         }
     </style>
 </head>
 <body>
 
-<!-- ========== NAVBAR ========== -->
+<!-- ========== NAVBAR (فقط لوجو + دارك مود) ========== -->
 <nav>
     <div class="logo-area">
         <img src="photo_2026-02-17_19-01-20.jpg" alt="Phoenix">
-        <div class="logo-text"><h2>Phoenix</h2><span>donate & trade</span></div>
-    </div>
-    <div class="nav-links">
-        <a href="dashboard.html">Home</a>
-        <a href="market.html">Market</a>
-        <a href="about.html" class="active">About</a>
-    </div>
-    <div class="nav-right">
-        <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
-        <div class="notification-wrapper">
-            <i class="fas fa-bell nav-icon" id="notificationBell"></i>
-            <span class="notification-badge">0</span>
+        <div class="logo-text">
+            <h2>Phoenix</h2>
+            <span>donate & trade</span>
         </div>
-        <div class="message-wrapper">
-            <i class="fas fa-comment-dots nav-icon" id="messageIcon"></i>
-            <span class="message-badge">0</span>
-        </div>
-        <a href="profile.html" class="profile-badge" id="profileBadge">U</a>
-        <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
-        <span class="hamburger" id="hamburger">☰</span>
     </div>
+    <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
 </nav>
-
-<!-- Sidebar -->
-<div class="sidebar" id="sidebar">
-    <div class="close-btn" id="closeSidebar">✕</div>
-    <ul>
-        <li><a href="dashboard.html"><i class="fas fa-home"></i> Home</a></li>
-        <li><a href="market.html"><i class="fas fa-store"></i> Market</a></li>
-        <li><a href="about.html"><i class="fas fa-info-circle"></i> About</a></li>
-        <li><a href="profile.html"><i class="fas fa-user"></i> Profile</a></li>
-        <li><a href="favourites.html"><i class="fas fa-heart"></i> Favorites</a></li>
-        <li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li>
-        <li><button id="sidebarDarkMode"><i class="fas fa-moon"></i> Dark Mode</button></li>
-        <li><button id="sidebarLogout"><i class="fas fa-sign-out-alt"></i> Logout</button></li>
-    </ul>
-</div>
-<div class="overlay" id="overlay"></div>
 
 <main>
     <div class="about-hero">
@@ -319,7 +220,6 @@
             <div class="mission-card"><div class="mission-icon"><i class="fas fa-heart"></i></div><h3>Our Values</h3><p>Trust, sustainability, community impact, innovation.</p></div>
         </div>
 
-        <!-- Phoenix Story (النص الكامل) -->
         <div class="story-section">
             <div class="story-text">
                 <h2>The Phoenix Story</h2>
@@ -333,7 +233,6 @@
             </div>
         </div>
 
-        <!-- How It Works -->
         <div class="howitworks">
             <h2 style="text-align: center;">How It Works</h2>
             <div class="flow-steps">
@@ -345,7 +244,6 @@
             </div>
         </div>
 
-        <!-- Gallery -->
         <div class="gallery">
             <h2 style="text-align: center;">Moments of Giving & Exchange</h2>
             <div class="gallery-grid">
@@ -357,7 +255,6 @@
             </div>
         </div>
 
-        <!-- Team Section -->
         <div class="team-section">
             <h2 style="text-align: center;">Meet the Phoenix Team</h2>
             <div class="team-grid">
@@ -375,7 +272,7 @@
     </div>
 </main>
 
-<!-- Footer (القديم) -->
+<!-- Footer -->
 <footer class="simple-footer">
     <div class="footer-links">
         <a href="index.html">Home</a>
@@ -406,85 +303,17 @@
     (function(){
         'use strict';
 
-        // Dark Mode
+        // Dark Mode (localStorage)
         const themeToggle = document.getElementById('themeToggle');
-        const sidebarDarkBtn = document.getElementById('sidebarDarkMode');
         function applyTheme(isDark) {
             document.body.classList.toggle('dark', isDark);
             const icon = themeToggle.querySelector('i');
             icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
-            if (sidebarDarkBtn) sidebarDarkBtn.innerHTML = isDark ? '<i class="fas fa-sun"></i> Dark Mode' : '<i class="fas fa-moon"></i> Dark Mode';
             localStorage.setItem('phoenix-theme', isDark ? 'dark' : 'light');
         }
         const savedTheme = localStorage.getItem('phoenix-theme') === 'dark';
         applyTheme(savedTheme);
         themeToggle.addEventListener('click', () => applyTheme(!document.body.classList.contains('dark')));
-        if (sidebarDarkBtn) sidebarDarkBtn.addEventListener('click', () => applyTheme(!document.body.classList.contains('dark')));
-
-        // Profile Badge
-        const user = JSON.parse(localStorage.getItem('currentUser')) || { firstName: 'U' };
-        document.getElementById('profileBadge').textContent = (user.firstName || 'U').charAt(0).toUpperCase();
-
-        // Sidebar
-        const hamburger = document.getElementById('hamburger');
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('overlay');
-        function openSidebar() { sidebar.classList.add('open'); overlay.classList.add('active'); }
-        function closeSidebar() { sidebar.classList.remove('open'); overlay.classList.remove('active'); }
-        hamburger.addEventListener('click', openSidebar);
-        document.getElementById('closeSidebar').addEventListener('click', closeSidebar);
-        overlay.addEventListener('click', closeSidebar);
-        function logout() { if(confirm('Logout?')) { localStorage.removeItem('currentUser'); window.location.href='index.html'; } }
-        document.getElementById('logoutBtn').addEventListener('click', logout);
-        document.getElementById('sidebarLogout')?.addEventListener('click', logout);
-
-        // Dropdowns (Notifications & Messages)
-        let activeDropdown = null;
-        const notificationDropdown = document.createElement('div');
-        notificationDropdown.className = 'notification-dropdown';
-        notificationDropdown.innerHTML = `<div class="dropdown-header"><h3>Notifications</h3><button class="mark-read-btn">Mark all read</button></div><div class="notifications-list" id="notificationsList"></div><div class="dropdown-footer"><a href="#" id="viewAllNotificationsLink">View all</a></div>`;
-        document.body.appendChild(notificationDropdown);
-
-        const messageDropdown = document.createElement('div');
-        messageDropdown.className = 'message-dropdown';
-        messageDropdown.innerHTML = `<div class="dropdown-header"><h3>Messages</h3><button class="mark-read-btn">Mark all read</button></div><div class="messages-list" id="messagesList"></div><div class="dropdown-footer"><a href="#" id="viewAllMessagesLink">View all</a></div>`;
-        document.body.appendChild(messageDropdown);
-
-        const notifications = [
-            { id:1, type:'message', title:'New message', description:'Ahmed sent you a message', time:'2m ago', user:'Ahmed' },
-            { id:2, type:'donation', title:'Donation request', description:'Laila wants your coat', time:'1h ago', user:'Laila' }
-        ];
-        const messages = [
-            { id:1, sender:'Ahmed Hassan', avatar:'https://i.pravatar.cc/40?img=7', preview:'Hey, still available?', time:'2m ago', user:'Ahmed' },
-            { id:2, sender:'Laila M.', avatar:'https://i.pravatar.cc/40?img=5', preview:'Thanks!', time:'1h ago', user:'Laila' }
-        ];
-
-        function renderDropdowns() {
-            document.getElementById('notificationsList').innerHTML = notifications.map(n=>`<div class="notification-item" data-user="${n.user}"><div class="notification-icon"><i class="fas fa-${n.type==='message'?'envelope':'heart'}"></i></div><div class="notification-content"><div class="notification-title">${n.title}</div><div class="notification-desc">${n.description}</div><div class="notification-time">${n.time}</div></div></div>`).join('');
-            document.getElementById('messagesList').innerHTML = messages.map(m=>`<div class="message-item" data-user="${m.user}"><div class="message-avatar"><img src="${m.avatar}"></div><div class="message-content"><div class="message-sender">${m.sender}</div><div class="message-preview">${m.preview}</div><div class="message-time">${m.time}</div></div></div>`).join('');
-            document.querySelectorAll('.notification-item, .message-item').forEach(el=> el.addEventListener('click', ()=> window.location.href = `chat.html?user=${el.dataset.user}`));
-        }
-        renderDropdowns();
-        document.getElementById('viewAllNotificationsLink').addEventListener('click', e=>{ e.preventDefault(); window.location.href='notifications.html'; });
-        document.getElementById('viewAllMessagesLink').addEventListener('click', e=>{ e.preventDefault(); window.location.href='chat.html'; });
-
-        function closeAllDropdowns() {
-            notificationDropdown.classList.remove('show');
-            messageDropdown.classList.remove('show');
-            activeDropdown = null;
-        }
-        function openDropdown(type, iconEl) {
-            closeAllDropdowns();
-            const dropdown = type==='notification' ? notificationDropdown : messageDropdown;
-            const rect = iconEl.getBoundingClientRect();
-            dropdown.style.top = (rect.bottom + window.scrollY + 5) + 'px';
-            dropdown.style.right = (window.innerWidth - rect.right - window.scrollX) + 'px';
-            dropdown.classList.add('show');
-            activeDropdown = type;
-        }
-        document.getElementById('notificationBell').addEventListener('click', e=>{ e.stopPropagation(); activeDropdown==='notification' ? closeAllDropdowns() : openDropdown('notification', e.currentTarget); });
-        document.getElementById('messageIcon').addEventListener('click', e=>{ e.stopPropagation(); activeDropdown==='message' ? closeAllDropdowns() : openDropdown('message', e.currentTarget); });
-        document.addEventListener('click', e=>{ if(!e.target.closest('.notification-wrapper')&&!e.target.closest('.notification-dropdown')&&!e.target.closest('.message-wrapper')&&!e.target.closest('.message-dropdown')) closeAllDropdowns(); });
 
         // Chatbot
         (function(){
