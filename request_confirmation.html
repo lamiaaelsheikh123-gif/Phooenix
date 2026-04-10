@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <title>Phoenix · Request Confirmation</title>
+  <!-- Font Awesome & Google Fonts -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <style>
+    /* ========== الأساسيات والمتغيرات ========== */
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+    :root {
+      --bg: #f9fafc; --surface: #ffffff; --text-primary: #1e1e2f; --text-secondary: #4a4a5e;
+      --accent-1: #ff8a4c; --accent-2: #ff6b2b; --gradient: linear-gradient(135deg, #ff8a4c, #ff4d4d);
+      --border: #eaeef2; --shadow: 0 20px 30px -10px rgba(0,0,0,0.05); --glow: rgba(255,110,64,0.4);
+      --navbar-bg: rgba(255,255,255,0.8); --divider-color: #eaeef2;
+    }
+    body.dark {
+      --bg: #12121a; --surface: #1e1e2a; --text-primary: #f0f0fa; --text-secondary: #b0b0c0;
+      --accent-1: #ff9f6e; --accent-2: #ff7b3f; --gradient: linear-gradient(135deg, #ff9f6e, #ff5e5e);
+      --border: #333344; --shadow: 0 20px 30px -10px rgba(0,0,0,0.7); --glow: rgba(255,140,80,0.6);
+      --navbar-bg: rgba(30,30,42,0.9); --divider-color: #333344;
+    }
+    body {
+      background: var(--bg); color: var(--text-primary); line-height: 1.5;
+      transition: background 0.3s, color 0.2s; min-height: 100vh;
+      display: flex; flex-direction: column;
+    }
+    .container { max-width: 800px; margin: 0 auto; padding: 2rem 1rem; width: 100%; flex: 1; }
+
+    /* ===== NAVBAR (موحّد) ===== */
+    nav {
+      position: sticky; top: 0; backdrop-filter: blur(12px); background: var(--navbar-bg);
+      border-bottom: 1px solid var(--border); z-index: 100; padding: 0.5rem 1rem;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .logo-area { display: flex; align-items: center; gap: 0.3rem; }
+    .logo-area img { height: 40px; width: auto; border-radius: 8px; }
+    .logo-text h2 { font-size: 1.2rem; font-weight: 700; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .logo-text span { font-size: 0.7rem; color: var(--text-secondary); display: block; }
+    .nav-links { display: flex; gap: 1.5rem; }
+    .nav-links a { text-decoration: none; color: var(--text-primary); font-weight: 500; transition: 0.2s; }
+    .nav-links a:hover { color: var(--accent-1); }
+    .nav-right { display: flex; align-items: center; gap: 0.8rem; position: relative; }
+    .nav-icon { font-size: 1.2rem; color: var(--text-primary); cursor: pointer; transition: 0.2s; }
+    .nav-icon:hover { color: var(--accent-1); }
+    .theme-toggle { background: none; border: none; color: var(--text-primary); font-size: 1.2rem; cursor: pointer; }
+    .profile-badge {
+      display: flex; align-items: center; justify-content: center; background: var(--surface);
+      border-radius: 50%; width: 40px; height: 40px; border: 1px solid var(--border);
+      cursor: pointer; text-decoration: none; color: var(--text-primary); font-weight: 600;
+    }
+    .logout-btn {
+      background: transparent; border: 1px solid var(--accent-1); color: var(--accent-1);
+      padding: 0.3rem 0.9rem; border-radius: 40px; font-weight: 600; cursor: pointer;
+    }
+    .logout-btn:hover { background: var(--accent-1); color: white; box-shadow: 0 0 15px var(--glow); }
+    .hamburger { display: none; font-size: 1.5rem; cursor: pointer; color: var(--text-primary); margin-left: 0.5rem; }
+
+    /* Sidebar */
+    .sidebar {
+      position: fixed; top: 0; left: -100%; width: 250px; height: 100vh; background: var(--surface);
+      border-right: 1px solid var(--border); padding: 2rem 1rem; transition: left 0.3s; z-index: 200;
+    }
+    .sidebar.open { left: 0; }
+    .sidebar .close-btn { text-align: right; margin-bottom: 2rem; font-size: 1.5rem; cursor: pointer; }
+    .sidebar ul { list-style: none; }
+    .sidebar li { margin-bottom: 1.2rem; }
+    .sidebar a, .sidebar button {
+      text-decoration: none; color: var(--text-primary); font-weight: 500; font-size: 1.1rem;
+      display: flex; align-items: center; gap: 0.8rem; background: none; border: none; width: 100%; cursor: pointer;
+    }
+    .sidebar a:hover, .sidebar button:hover { color: var(--accent-1); }
+    .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 150; display: none; }
+    .overlay.active { display: block; }
+
+    /* القوائم المنسدلة (بدون أرقام) */
+    .notification-wrapper, .message-wrapper { position: relative; display: inline-flex; align-items: center; }
+    .notification-badge, .message-badge { display: none; }
+    .notification-dropdown, .message-dropdown {
+      position: absolute; top: calc(100% + 8px); right: 0; width: 360px; max-width: 90vw;
+      background: var(--surface); border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      border: 1px solid var(--border); z-index: 1001; display: none; flex-direction: column; overflow: hidden;
+    }
+    .notification-dropdown.show, .message-dropdown.show { display: flex; }
+    .dropdown-header { display: flex; justify-content: space-between; padding: 1rem 1.2rem; border-bottom: 1px solid var(--border); }
+    .dropdown-header h3 { font-size: 1.1rem; }
+    .mark-read-btn { background: none; border: none; color: var(--accent-1); font-size: 0.8rem; cursor: pointer; }
+    .notifications-list, .messages-list { max-height: 320px; overflow-y: auto; }
+    .notification-item, .message-item {
+      display: flex; gap: 0.8rem; padding: 1rem 1.2rem; border-bottom: 1px solid var(--border);
+      cursor: pointer; transition: background 0.2s;
+    }
+    .notification-item:hover, .message-item:hover { background: var(--bg); }
+    .notification-icon { font-size: 1.2rem; color: var(--accent-1); }
+    .notification-content, .message-content { flex: 1; }
+    .notification-title, .message-sender { font-weight: 600; font-size: 0.9rem; }
+    .notification-desc, .message-preview { font-size: 0.8rem; color: var(--text-secondary); }
+    .notification-time, .message-time { font-size: 0.7rem; color: var(--text-secondary); margin-top: 0.2rem; }
+    .message-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--accent-1); overflow: hidden; }
+    .message-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .dropdown-footer { padding: 0.8rem; text-align: center; border-top: 1px solid var(--border); }
+    .dropdown-footer a { color: var(--text-secondary); text-decoration: none; font-size: 0.85rem; }
+    .dropdown-footer a:hover { color: var(--accent-1); text-decoration: underline; }
+
+    /* Confirmation Card */
+    .confirmation-card {
+      background: var(--surface); border-radius: 30px; border: 1px solid var(--border);
+      padding: 2.5rem 2rem; text-align: center; box-shadow: var(--shadow);
+      margin-top: 2rem;
+    }
+    .confirmation-icon { font-size: 4rem; color: var(--accent-1); margin-bottom: 1.5rem; }
+    .confirmation-card h1 {
+      font-size: 2rem; font-weight: 700; margin-bottom: 1rem;
+      background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .confirmation-card p { font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 2rem; }
+    .button-group { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      background: var(--gradient); color: white; border: none; padding: 0.9rem 2rem;
+      border-radius: 60px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 14px var(--glow);
+      display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none;
+    }
+    .btn-outline {
+      background: transparent; border: 2px solid var(--accent-1); color: var(--accent-1);
+      padding: 0.9rem 2rem; border-radius: 60px; font-weight: 600; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none;
+    }
+
+    /* Footer */
+    .simple-footer {
+      margin-top: 3rem; padding: 1.5rem; text-align: center;
+      border-top: 1px solid var(--divider-color); color: var(--text-secondary); font-size: 0.9rem;
+    }
+    .simple-footer a { color: var(--accent-1); text-decoration: none; font-weight: 500; }
+    .simple-footer a:hover { text-decoration: underline; }
+
+    /* Chatbot */
+    .chatbot {
+      position: fixed; bottom: 20px; right: 20px; z-index: 999;
+      display: flex; flex-direction: column; align-items: center; gap: 0px;
+    }
+    .chat-circle {
+      width: 56px; height: 56px; background: linear-gradient(145deg, #ff9f4a, #ff4d2e);
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; box-shadow: 0 0 15px rgba(255,80,40,0.8), 0 8px 20px rgba(0,0,0,0.2);
+      animation: float-glow 2.2s infinite; position: relative;
+    }
+    .chat-circle img { width: 46px; height: 46px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,255,255,0.6); }
+    .chat-circle::after {
+      content: ''; position: absolute; top: -4px; left: -4px; right: -4px; bottom: -4px;
+      border-radius: 50%; background: radial-gradient(circle, rgba(255,100,40,0.6), transparent 70%);
+      z-index: -1; animation: pulse-ring 1.8s infinite; pointer-events: none;
+    }
+    @keyframes float-glow {
+      0% { transform: translateY(0px); box-shadow: 0 0 12px rgba(255,80,40,0.7); }
+      50% { transform: translateY(-6px); box-shadow: 0 0 28px rgba(255,100,50,1); }
+      100% { transform: translateY(0px); box-shadow: 0 0 12px rgba(255,80,40,0.7); }
+    }
+    @keyframes pulse-ring {
+      0% { opacity: 0.6; transform: scale(1); }
+      70% { opacity: 0; transform: scale(1.3); }
+      100% { opacity: 0; transform: scale(1.3); }
+    }
+    .chat-label {
+      background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); color: #ffaa66;
+      font-size: 0.65rem; font-weight: 600; padding: 3px 8px; border-radius: 30px;
+      margin-top: 6px; cursor: pointer; border: 1px solid #ff8a4c;
+    }
+    .chat-box {
+      position: absolute; bottom: 80px; right: 0; width: 90vw; max-width: 450px; height: 500px;
+      background: rgba(255,255,255,0.75); backdrop-filter: blur(16px); border-radius: 28px;
+      border: 1px solid rgba(255,255,255,0.3); display: none; flex-direction: column; overflow: hidden;
+    }
+    body.dark .chat-box { background: rgba(30,30,42,0.85); }
+    .chat-box.show { display: flex; }
+    .chat-header { padding: 1rem 1.2rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
+    .chat-header h4 { font-weight: 700; color: var(--accent-1); }
+    .close-chat { background: none; border: none; font-size: 1.2rem; cursor: pointer; }
+    .chat-messages { flex: 1; padding: 1rem; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+    .chat-message {
+      max-width: 85%; padding: 8px 14px; border-radius: 20px; background: var(--surface);
+      align-self: flex-start; border: 1px solid var(--border);
+    }
+    .chat-message.bot { background: var(--gradient); color: white; border: none; }
+    .chat-input-area { display: flex; padding: 10px; gap: 8px; border-top: 1px solid var(--border); }
+    .chat-input-area textarea {
+      flex: 1; background: var(--surface); border: none; border-radius: 40px;
+      padding: 8px 14px; resize: none;
+    }
+    .chat-input-area button {
+      background: var(--gradient); border: none; border-radius: 40px; padding: 0 18px;
+      color: white; font-weight: bold; cursor: pointer;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .nav-links, .nav-right .theme-toggle, .nav-right .notification-wrapper, .nav-right .message-wrapper, .nav-right .profile-badge, .nav-right .logout-btn { display: none; }
+      .hamburger { display: block; }
+    }
+    @media (min-width: 769px) {
+      .hamburger { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ========== NAVBAR (موحّد) ========== -->
+<nav>
+  <div class="logo-area">
+    <img src="photo_2026-02-17_19-01-20.jpg" alt="Phoenix">
+    <div class="logo-text"><h2>Phoenix</h2><span>donate & trade</span></div>
+  </div>
+  <div class="nav-links">
+    <a href="dashboard.html">Home</a>
+    <a href="market.html">Market</a>
+    <a href="about.html">About</a>
+  </div>
+  <div class="nav-right">
+    <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
+    <div class="notification-wrapper">
+      <i class="fas fa-bell nav-icon" id="notificationBell"></i>
+      <span class="notification-badge">0</span>
+    </div>
+    <div class="message-wrapper">
+      <i class="fas fa-comment-dots nav-icon" id="messageIcon"></i>
+      <span class="message-badge">0</span>
+    </div>
+    <a href="settings.html" class="nav-icon" id="settingsIcon"><i class="fas fa-cog"></i></a>
+    <a href="profile.html" class="profile-badge" id="profileBadge">U</a>
+    <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    <span class="hamburger" id="hamburger">☰</span>
+  </div>
+</nav>
+
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+  <div class="close-btn" id="closeSidebar">✕</div>
+  <ul>
+    <li><a href="dashboard.html"><i class="fas fa-home"></i> Home</a></li>
+    <li><a href="market.html"><i class="fas fa-store"></i> Market</a></li>
+    <li><a href="about.html"><i class="fas fa-info-circle"></i> About</a></li>
+    <li><a href="profile.html"><i class="fas fa-user"></i> Profile</a></li>
+    <li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+    <li><button id="sidebarDarkMode"><i class="fas fa-moon"></i> Dark Mode</button></li>
+    <li><button id="sidebarLogout"><i class="fas fa-sign-out-alt"></i> Logout</button></li>
+  </ul>
+</div>
+<div class="overlay" id="overlay"></div>
+
+<main class="container">
+  <div class="confirmation-card">
+    <div class="confirmation-icon"><i class="fas fa-check-circle"></i></div>
+    <h1>Request Sent!</h1>
+    <p>Great! Your request has been sent to the owner.<br>You can now coordinate the pickup via Chat.</p>
+    <div class="button-group">
+      <a href="#" class="btn-primary" id="goToChatBtn"><i class="fas fa-comment"></i> Go to Chat</a>
+      <a href="market.html" class="btn-outline"><i class="fas fa-arrow-left"></i> Back to Market</a>
+    </div>
+  </div>
+</main>
+
+<!-- Footer -->
+<footer class="simple-footer">
+  Copyright © 2026 Phoenix — <a href="about.html">About</a>
+</footer>
+
+<!-- Chatbot -->
+<div class="chatbot">
+  <div class="chat-circle" id="chatIcon">
+    <img src="photo_2026-02-17_19-01-20.jpg" alt="Phoenix AI">
+  </div>
+  <span class="chat-label" id="chatLabel">Ask AI</span>
+  <div class="chat-box" id="chatBox">
+    <div class="chat-header">
+      <h4><i class="fas fa-feather-alt"></i> Phoenix Personal AI Assistant</h4>
+      <button class="close-chat" id="closeChatBtn">✕</button>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+      <div class="chat-message bot">👋 Hi! I'm Phoenix AI. How can I help you today?</div>
+    </div>
+    <div class="chat-input-area">
+      <textarea id="chatInput" placeholder="Type your message..." rows="1"></textarea>
+      <button id="sendChat">Send</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function(){
+    'use strict';
+
+    // ========== 1. إنقاص عداد التبرعات ==========
+    function decrementDonationCounter() {
+      const currentUser = JSON.parse(localStorage.getItem('currentUser')) || {};
+      const userId = currentUser.id || currentUser.email || 'guest';
+      const STORAGE_KEY = `donationRequests_${userId}`;
+      const MAX_REQUESTS = 3;
+      
+      let remaining = parseInt(localStorage.getItem(STORAGE_KEY));
+      if (isNaN(remaining)) remaining = MAX_REQUESTS;
+      
+      if (remaining > 0) {
+        localStorage.setItem(STORAGE_KEY, remaining - 1);
+        console.log(`Donation counter decreased to ${remaining - 1}`);
+        return true;
+      }
+      return false;
+    }
+
+    // تنفيذ الإنقاص فوراً عند تحميل الصفحة (تأكيد الطلب)
+    decrementDonationCounter();
+
+    // ========== 2. استعادة سياق المحادثة وتوجيه زر Go to Chat ==========
+    const chatContext = JSON.parse(localStorage.getItem('chatContext') || '{}');
+    const owner = chatContext.owner || 'Unknown';
+    const productTitle = chatContext.productTitle || '';
+    const productId = chatContext.productId || '';
+
+    document.getElementById('goToChatBtn').addEventListener('click', (e) => {
+      e.preventDefault();
+      window.location.href = `chat.html?seller=${encodeURIComponent(owner)}&product=${encodeURIComponent(productTitle)}&productId=${productId}`;
+    });
+
+    // ========== 3. إعدادات النافبار: Profile & Dark Mode ==========
+    const user = JSON.parse(localStorage.getItem('currentUser')) || { firstName: 'U' };
+    document.getElementById('profileBadge').textContent = (user.firstName || 'U').charAt(0).toUpperCase();
+
+    const themeToggle = document.getElementById('themeToggle');
+    const sidebarDarkBtn = document.getElementById('sidebarDarkMode');
+    function toggleDark() {
+      document.body.classList.toggle('dark');
+      const icon = themeToggle.querySelector('i');
+      if (document.body.classList.contains('dark')) {
+        icon.classList.remove('fa-moon'); icon.classList.add('fa-sun');
+        if (sidebarDarkBtn) sidebarDarkBtn.innerHTML = '<i class="fas fa-sun"></i> Dark Mode';
+      } else {
+        icon.classList.remove('fa-sun'); icon.classList.add('fa-moon');
+        if (sidebarDarkBtn) sidebarDarkBtn.innerHTML = '<i class="fas fa-moon"></i> Dark Mode';
+      }
+      localStorage.setItem('phoenix-theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+    }
+    themeToggle.addEventListener('click', toggleDark);
+    if (sidebarDarkBtn) sidebarDarkBtn.addEventListener('click', toggleDark);
+    if (localStorage.getItem('phoenix-theme') === 'dark') document.body.classList.add('dark');
+
+    // ========== 4. Sidebar & Logout ==========
+    const hamburger = document.getElementById('hamburger');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    function openSidebar() { sidebar.classList.add('open'); overlay.classList.add('active'); }
+    function closeSidebar() { sidebar.classList.remove('open'); overlay.classList.remove('active'); }
+    hamburger.addEventListener('click', openSidebar);
+    document.getElementById('closeSidebar').addEventListener('click', closeSidebar);
+    overlay.addEventListener('click', closeSidebar);
+    function logout() {
+      if (confirm('Logout?')) { localStorage.removeItem('currentUser'); window.location.href = 'index.html'; }
+    }
+    document.getElementById('logoutBtn').addEventListener('click', logout);
+    document.getElementById('sidebarLogout')?.addEventListener('click', logout);
+
+    // ========== 5. نظام القوائم المنسدلة (إشعارات ورسائل) ==========
+    let activeDropdown = null;
+    const notificationDropdown = document.createElement('div');
+    notificationDropdown.className = 'notification-dropdown';
+    notificationDropdown.innerHTML = `
+      <div class="dropdown-header"><h3>Notifications</h3><button class="mark-read-btn" id="markAllReadNotif">Mark all read</button></div>
+      <div class="notifications-list" id="notificationsList"></div>
+      <div class="dropdown-footer"><a href="#" id="viewAllNotificationsLink">View all</a></div>
+    `;
+    document.body.appendChild(notificationDropdown);
+
+    const messageDropdown = document.createElement('div');
+    messageDropdown.className = 'message-dropdown';
+    messageDropdown.innerHTML = `
+      <div class="dropdown-header"><h3>Messages</h3><button class="mark-read-btn" id="markAllReadMsg">Mark all read</button></div>
+      <div class="messages-list" id="messagesList"></div>
+      <div class="dropdown-footer"><a href="#" id="viewAllMessagesLink">View all</a></div>
+    `;
+    document.body.appendChild(messageDropdown);
+
+    const notifications = [
+      { id:1, type:'message', title:'New message', description:'Ahmed sent you a message', time:'2m ago', user:'Ahmed' },
+      { id:2, type:'donation', title:'Donation request', description:'Laila wants your coat', time:'1h ago', user:'Laila' }
+    ];
+    const messages = [
+      { id:1, sender:'Ahmed Hassan', avatar:'https://i.pravatar.cc/40?img=7', preview:'Hey, still available?', time:'2m ago', user:'Ahmed' },
+      { id:2, sender:'Laila M.', avatar:'https://i.pravatar.cc/40?img=5', preview:'Thanks!', time:'1h ago', user:'Laila' }
+    ];
+
+    function renderNotifications() {
+      const list = document.getElementById('notificationsList');
+      if (!list) return;
+      list.innerHTML = notifications.map(n => `
+        <div class="notification-item" data-user="${n.user}" data-type="${n.type}">
+          <div class="notification-icon"><i class="fas fa-${n.type==='message'?'envelope':'heart'}"></i></div>
+          <div class="notification-content">
+            <div class="notification-title">${n.title}</div>
+            <div class="notification-desc">${n.description}</div>
+            <div class="notification-time">${n.time}</div>
+          </div>
+        </div>
+      `).join('');
+      list.querySelectorAll('.notification-item').forEach(el => {
+        el.addEventListener('click', () => {
+          const user = el.dataset.user;
+          const type = el.dataset.type;
+          if (type === 'message') {
+            window.location.href = `chat.html?user=${encodeURIComponent(user)}`;
+          } else {
+            window.location.href = 'notifications.html';
+          }
+        });
+      });
+    }
+
+    function renderMessages() {
+      const list = document.getElementById('messagesList');
+      if (!list) return;
+      list.innerHTML = messages.map(m => `
+        <div class="message-item" data-user="${m.user}">
+          <div class="message-avatar"><img src="${m.avatar}" onerror="this.src='https://i.pravatar.cc/40?u=${m.sender}'"></div>
+          <div class="message-content">
+            <div class="message-sender">${m.sender}</div>
+            <div class="message-preview">${m.preview}</div>
+            <div class="message-time">${m.time}</div>
+          </div>
+        </div>
+      `).join('');
+      list.querySelectorAll('.message-item').forEach(el => {
+        el.addEventListener('click', () => window.location.href = `chat.html?user=${el.dataset.user}`);
+      });
+    }
+
+    renderNotifications(); renderMessages();
+
+    document.getElementById('viewAllNotificationsLink').addEventListener('click', e => {
+      e.preventDefault(); window.location.href = 'notifications.html';
+    });
+    document.getElementById('viewAllMessagesLink').addEventListener('click', e => {
+      e.preventDefault(); window.location.href = 'chat.html';
+    });
+
+    function closeAllDropdowns() {
+      notificationDropdown.classList.remove('show');
+      messageDropdown.classList.remove('show');
+      activeDropdown = null;
+    }
+
+    function openDropdown(type, iconEl) {
+      closeAllDropdowns();
+      const dropdown = type === 'notification' ? notificationDropdown : messageDropdown;
+      const rect = iconEl.getBoundingClientRect();
+      dropdown.style.top = (rect.bottom + window.scrollY + 5) + 'px';
+      dropdown.style.right = (window.innerWidth - rect.right - window.scrollX) + 'px';
+      dropdown.classList.add('show');
+      activeDropdown = type;
+    }
+
+    document.getElementById('notificationBell').addEventListener('click', e => {
+      e.stopPropagation();
+      activeDropdown === 'notification' ? closeAllDropdowns() : openDropdown('notification', e.currentTarget);
+    });
+    document.getElementById('messageIcon').addEventListener('click', e => {
+      e.stopPropagation();
+      activeDropdown === 'message' ? closeAllDropdowns() : openDropdown('message', e.currentTarget);
+    });
+
+    document.addEventListener('click', e => {
+      if (!e.target.closest('.notification-wrapper') && !e.target.closest('.notification-dropdown') &&
+          !e.target.closest('.message-wrapper') && !e.target.closest('.message-dropdown')) {
+        closeAllDropdowns();
+      }
+    });
+
+    // ========== 6. Chatbot ==========
+    (function(){
+      const chatIcon = document.getElementById('chatIcon');
+      const chatBox = document.getElementById('chatBox');
+      const chatMessages = document.getElementById('chatMessages');
+      const chatInput = document.getElementById('chatInput');
+      const sendBtn = document.getElementById('sendChat');
+      const closeChatBtn = document.getElementById('closeChatBtn');
+
+      function toggleChat() { chatBox.classList.toggle('show'); }
+      chatIcon.addEventListener('click', toggleChat);
+      document.getElementById('chatLabel').addEventListener('click', toggleChat);
+      closeChatBtn.addEventListener('click', () => chatBox.classList.remove('show'));
+
+      function addMessage(text, isUser = false) {
+        const div = document.createElement('div');
+        div.className = 'chat-message' + (isUser ? '' : ' bot');
+        div.textContent = text;
+        chatMessages.appendChild(div);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+
+      function sendMessage() {
+        const msg = chatInput.value.trim();
+        if (!msg) return;
+        addMessage(msg, true);
+        chatInput.value = '';
+        setTimeout(() => addMessage('Thanks! Phoenix AI will assist you shortly. 🔥'), 600);
+      }
+
+      sendBtn.addEventListener('click', sendMessage);
+      chatInput.addEventListener('keypress', e => {
+        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+      });
+
+      document.addEventListener('click', e => {
+        if (!chatBox.contains(e.target) && !chatIcon.contains(e.target) && !document.getElementById('chatLabel').contains(e.target)) {
+          chatBox.classList.remove('show');
+        }
+      });
+    })();
+
+  })();
+</script>
+</body>
+</html>

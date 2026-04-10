@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <title>Phoenix · Messages</title>
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- Google Fonts: Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+    :root {
+      --bg: #f9fafc;
+      --surface: #ffffff;
+      --text-primary: #1e1e2f;
+      --text-secondary: #4a4a5e;
+      --accent-1: #ff8a4c;
+      --accent-2: #ff6b2b;
+      --gradient: linear-gradient(135deg, #ff8a4c, #ff4d4d);
+      --border: #eaeef2;
+      --shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.05);
+      --glow: rgba(255, 110, 64, 0.4);
+      --navbar-bg: rgba(255, 255, 255, 0.8);
+      --sent-bg: linear-gradient(135deg, #ff8a4c, #ff4d4d);
+      --received-bg: #ffffff;
+      --input-bg: #f5f5f5;
+    }
+
+    body.dark {
+      --bg: #12121a;
+      --surface: #1e1e2a;
+      --text-primary: #f0f0fa;
+      --text-secondary: #b0b0c0;
+      --accent-1: #ff9f6e;
+      --accent-2: #ff7b3f;
+      --gradient: linear-gradient(135deg, #ff9f6e, #ff5e5e);
+      --border: #333344;
+      --shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.7);
+      --glow: rgba(255, 140, 80, 0.6);
+      --navbar-bg: rgba(30, 30, 42, 0.9);
+      --sent-bg: linear-gradient(135deg, #ff9f6e, #ff5e5e);
+      --received-bg: #2a2a3c;
+      --input-bg: #252533;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text-primary);
+      line-height: 1.5;
+      transition: background 0.3s, color 0.2s;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ===== NAVBAR ===== */
+    .nav-mini {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.6rem 1.5rem;
+      background: var(--navbar-bg);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .logo-area img {
+      height: 44px;
+      width: auto;
+      border-radius: 10px;
+    }
+
+    .logo-text h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .logo-text span {
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      display: block;
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .theme-toggle {
+      background: none;
+      border: none;
+      color: var(--text-primary);
+      font-size: 1.3rem;
+      cursor: pointer;
+    }
+
+    /* ===== CHAT LAYOUT ===== */
+    .chat-layout {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* Sidebar (قائمة المحادثات) */
+    .chat-sidebar {
+      width: 340px;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar-header {
+      padding: 1.2rem 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sidebar-header h3 {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    .search-box {
+      position: relative;
+    }
+
+    .search-box i {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 0.7rem 1rem 0.7rem 2.4rem;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 30px;
+      color: var(--text-primary);
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    .search-box input:focus {
+      border-color: var(--accent-1);
+    }
+
+    .conversation-list {
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .conversation-item {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 1rem;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .conversation-item:hover {
+      background: rgba(255, 138, 76, 0.05);
+    }
+
+    .conversation-item.active {
+      background: rgba(255, 138, 76, 0.12);
+      border-left: 4px solid var(--accent-1);
+    }
+
+    .conv-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--accent-1);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+
+    .conv-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .conv-name-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.2rem;
+    }
+
+    .conv-name {
+      font-weight: 600;
+    }
+
+    .conv-time {
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+    }
+
+    .conv-lastmsg {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .unread-badge {
+      background: var(--accent-1);
+      color: white;
+      border-radius: 12px;
+      min-width: 20px;
+      height: 20px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0 5px;
+      margin-left: 6px;
+    }
+
+    /* Main Chat Window */
+    .chat-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg);
+    }
+
+    .chat-header {
+      padding: 0.8rem 1.2rem;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      flex-shrink: 0;
+    }
+
+    .mobile-back-btn {
+      background: none;
+      border: none;
+      color: var(--accent-1);
+      font-size: 1.4rem;
+      cursor: pointer;
+      display: none;
+      margin-right: 0.3rem;
+    }
+
+    .chat-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--accent-1);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+
+    .chat-header-info h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .chat-header-info p {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    .chat-messages {
+      flex: 1;
+      padding: 1.2rem 1rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .message-bubble {
+      max-width: 70%;
+      padding: 0.7rem 1rem;
+      border-radius: 18px;
+      position: relative;
+      word-wrap: break-word;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      line-height: 1.4;
+      font-size: 0.9rem;
+    }
+
+    .message-bubble.sent {
+      background: var(--sent-bg);
+      color: white;
+      align-self: flex-end;
+      border-bottom-right-radius: 5px;
+    }
+
+    .message-bubble.received {
+      background: var(--received-bg);
+      border: 1px solid var(--border);
+      align-self: flex-start;
+      border-bottom-left-radius: 5px;
+    }
+
+    .message-time {
+      font-size: 0.6rem;
+      opacity: 0.7;
+      margin-top: 0.3rem;
+      text-align: right;
+    }
+
+    /* رسائل الصور والملفات */
+    .message-image {
+      max-width: 200px;
+      max-height: 200px;
+      border-radius: 12px;
+      margin-bottom: 0.3rem;
+      cursor: pointer;
+      object-fit: cover;
+    }
+
+    .message-file {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(0,0,0,0.05);
+      padding: 0.5rem;
+      border-radius: 12px;
+      margin-bottom: 0.3rem;
+    }
+
+    .message-file i {
+      font-size: 1.5rem;
+      color: var(--accent-1);
+    }
+
+    .message-file a {
+      color: var(--text-primary);
+      text-decoration: none;
+      font-weight: 500;
+      word-break: break-all;
+    }
+
+    .typing-indicator {
+      align-self: flex-start;
+      background: var(--received-bg);
+      border: 1px solid var(--border);
+      padding: 0.7rem 1rem;
+      border-radius: 18px;
+      border-bottom-left-radius: 5px;
+      display: flex;
+      align-items: center;
+      gap: 0.2rem;
+      color: var(--text-secondary);
+      font-style: italic;
+      font-size: 0.85rem;
+    }
+
+    .typing-indicator i {
+      font-size: 0.5rem;
+      animation: blink 1.4s infinite;
+    }
+
+    .typing-indicator i:nth-child(2) { animation-delay: 0.2s; }
+    .typing-indicator i:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes blink {
+      0%, 60%, 100% { opacity: 0.3; }
+      30% { opacity: 1; }
+    }
+
+    .chat-input-area {
+      padding: 0.8rem 1rem;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .chat-input-area input {
+      flex: 1;
+      padding: 0.7rem 1rem;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 30px;
+      color: var(--text-primary);
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    .chat-input-area button {
+      background: var(--gradient);
+      border: none;
+      color: white;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 2px 8px var(--glow);
+      transition: transform 0.2s;
+    }
+
+    .attach-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    /* Empty State */
+    .empty-state {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .empty-state i {
+      font-size: 3.5rem;
+      color: var(--accent-1);
+      opacity: 0.6;
+      margin-bottom: 1rem;
+    }
+
+    /* Lightbox للتكبير */
+    .lightbox {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.9);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .lightbox img {
+      max-width: 90%;
+      max-height: 90%;
+      object-fit: contain;
+    }
+
+    .lightbox .close-lightbox {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      color: white;
+      font-size: 2rem;
+      cursor: pointer;
+    }
+
+    /* Responsive - Mobile */
+    @media (max-width: 768px) {
+      .chat-sidebar {
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        z-index: 20;
+        transition: transform 0.25s ease;
+        transform: translateX(0);
+      }
+
+      .chat-sidebar.sidebar-hidden {
+        transform: translateX(-100%);
+      }
+
+      .mobile-back-btn {
+        display: block;
+      }
+
+      .chat-main {
+        width: 100%;
+      }
+
+      .chat-header {
+        padding: 0.7rem 1rem;
+      }
+
+      .message-bubble {
+        max-width: 85%;
+        font-size: 0.85rem;
+        padding: 0.6rem 0.9rem;
+      }
+
+      .chat-input-area {
+        padding: 0.7rem 0.8rem;
+      }
+    }
+
+    /* Desktop: إخفاء سهم الرجوع */
+    @media (min-width: 769px) {
+      .chat-sidebar {
+        position: relative;
+        transform: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox">
+  <span class="close-lightbox" id="closeLightbox">&times;</span>
+  <img id="lightboxImg" src="" alt="Preview">
+</div>
+
+<!-- ========== NAVBAR ========== -->
+<div class="nav-mini">
+  <div class="logo-area">
+    <img src="photo_2026-02-17_19-01-20.jpg" alt="Phoenix">
+    <div class="logo-text">
+      <h2>Phoenix</h2>
+      <span>donate & trade</span>
+    </div>
+  </div>
+  <div class="nav-right">
+    <button class="theme-toggle" id="themeToggle">
+      <i class="fas fa-moon"></i>
+    </button>
+  </div>
+</div>
+
+<!-- ========== CHAT LAYOUT ========== -->
+<div class="chat-layout">
+  <!-- Sidebar (قائمة المحادثات) -->
+  <div class="chat-sidebar" id="chatSidebar">
+    <div class="sidebar-header">
+      <h3>Messages</h3>
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" placeholder="Search conversations...">
+      </div>
+    </div>
+    <div class="conversation-list" id="conversationList">
+      <!-- تُملأ عبر JavaScript -->
+    </div>
+  </div>
+
+  <!-- Main Chat Window -->
+  <div class="chat-main" id="chatMain">
+    <!-- Empty state -->
+    <div class="empty-state" id="emptyState">
+      <i class="far fa-comments"></i>
+      <h3>Select a conversation</h3>
+      <p>Choose a contact to start messaging</p>
+    </div>
+
+    <!-- Chat content -->
+    <div id="chatContent" style="display: none; flex-direction: column; height: 100%;">
+      <div class="chat-header">
+        <button class="mobile-back-btn" id="mobileBackBtn"><i class="fas fa-arrow-left"></i></button>
+        <div class="chat-avatar" id="activeAvatar">?</div>
+        <div class="chat-header-info">
+          <h3 id="activeName">Select contact</h3>
+          <p id="activeProduct"></p>
+        </div>
+      </div>
+      <div class="chat-messages" id="chatMessages">
+        <!-- الرسائل -->
+      </div>
+      <div class="chat-input-area">
+        <button class="attach-btn" id="attachBtn"><i class="fas fa-paperclip"></i></button>
+        <input type="text" id="messageInput" placeholder="Type a message..." disabled>
+        <button id="sendMessageBtn" disabled><i class="fas fa-paper-plane"></i></button>
+        <input type="file" id="fileInput" accept="image/*,application/pdf,.doc,.docx,.txt" style="display: none;" multiple>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    'use strict';
+
+    // ========== بيانات وهمية ==========
+    const conversations = [
+      {
+        id: 1,
+        name: 'Ahmed Hassan',
+        avatar: 'A',
+        product: 'MacBook Pro 16"',
+        lastMessage: 'Is the MacBook still available?',
+        time: '2m ago',
+        unread: 2,
+        messages: [
+          { sender: 'them', text: 'Hi! Is the MacBook still available?', time: '10:30 AM' },
+          { sender: 'me', text: 'Yes, it is! Are you interested?', time: '10:32 AM' },
+          { sender: 'them', text: 'Great! Can we meet tomorrow?', time: '10:35 AM' }
+        ]
+      },
+      {
+        id: 2,
+        name: 'Laila M.',
+        avatar: 'L',
+        product: 'Winter Coat',
+        lastMessage: 'Thanks for the coat!',
+        time: '1h ago',
+        unread: 0,
+        messages: [
+          { sender: 'them', text: 'I received the coat. It\'s perfect, thank you!', time: '09:15 AM' },
+          { sender: 'me', text: 'You\'re welcome! Stay warm.', time: '09:20 AM' }
+        ]
+      },
+      {
+        id: 3,
+        name: 'Omar S.',
+        avatar: 'O',
+        product: 'Kids Bicycle',
+        lastMessage: 'When can I pick it up?',
+        time: '3h ago',
+        unread: 1,
+        messages: [
+          { sender: 'them', text: 'Hello, I\'m interested in the bicycle.', time: 'Yesterday' },
+          { sender: 'me', text: 'Sure, it\'s still available.', time: 'Yesterday' }
+        ]
+      }
+    ];
+
+    // ========== عناصر DOM ==========
+    const sidebar = document.getElementById('chatSidebar');
+    const convList = document.getElementById('conversationList');
+    const emptyState = document.getElementById('emptyState');
+    const chatContent = document.getElementById('chatContent');
+    const chatMessages = document.getElementById('chatMessages');
+    const messageInput = document.getElementById('messageInput');
+    const sendBtn = document.getElementById('sendMessageBtn');
+    const activeName = document.getElementById('activeName');
+    const activeAvatar = document.getElementById('activeAvatar');
+    const activeProduct = document.getElementById('activeProduct');
+    const searchInput = document.getElementById('searchInput');
+    const mobileBackBtn = document.getElementById('mobileBackBtn');
+    const attachBtn = document.getElementById('attachBtn');
+    const fileInput = document.getElementById('fileInput');
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightboxImg');
+    const closeLightbox = document.getElementById('closeLightbox');
+
+    let activeConversationId = null;
+    let typingTimeout = null;
+
+    // ========== Dark Mode ==========
+    const themeToggle = document.getElementById('themeToggle');
+    const body = document.body;
+    
+    const savedTheme = localStorage.getItem('phoenix-theme');
+    if (savedTheme === 'dark') {
+      body.classList.add('dark');
+      themeToggle.querySelector('i').className = 'fas fa-sun';
+    }
+
+    function toggleDarkMode() {
+      body.classList.toggle('dark');
+      const isDark = body.classList.contains('dark');
+      themeToggle.querySelector('i').className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+      localStorage.setItem('phoenix-theme', isDark ? 'dark' : 'light');
+    }
+    themeToggle.addEventListener('click', toggleDarkMode);
+
+    // ========== Lightbox ==========
+    function showLightbox(src) {
+      lightboxImg.src = src;
+      lightbox.style.display = 'flex';
+    }
+    closeLightbox.addEventListener('click', () => lightbox.style.display = 'none');
+    lightbox.addEventListener('click', (e) => { if (e.target === lightbox) lightbox.style.display = 'none'; });
+
+    // ========== عرض قائمة المحادثات ==========
+    function renderConversationList(filterText = '') {
+      const filtered = conversations.filter(c => 
+        c.name.toLowerCase().includes(filterText.toLowerCase()) ||
+        c.product.toLowerCase().includes(filterText.toLowerCase())
+      );
+
+      convList.innerHTML = filtered.map(conv => `
+        <div class="conversation-item ${activeConversationId === conv.id ? 'active' : ''}" data-id="${conv.id}">
+          <div class="conv-avatar">${conv.avatar}</div>
+          <div class="conv-info">
+            <div class="conv-name-row">
+              <span class="conv-name">${conv.name}</span>
+              <span class="conv-time">${conv.time}</span>
+            </div>
+            <div class="conv-lastmsg">
+              ${conv.lastMessage}
+              ${conv.unread > 0 ? `<span class="unread-badge">${conv.unread}</span>` : ''}
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      document.querySelectorAll('.conversation-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const id = parseInt(item.dataset.id);
+          openConversation(id);
+        });
+      });
+    }
+
+    // ========== فتح محادثة ==========
+    function openConversation(id) {
+      const conv = conversations.find(c => c.id === id);
+      if (!conv) return;
+
+      activeConversationId = id;
+      
+      activeName.textContent = conv.name;
+      activeAvatar.textContent = conv.avatar;
+      activeProduct.innerHTML = `<i class="fas fa-tag"></i> ${conv.product}`;
+
+      emptyState.style.display = 'none';
+      chatContent.style.display = 'flex';
+
+      messageInput.disabled = false;
+      sendBtn.disabled = false;
+      attachBtn.disabled = false;
+
+      conv.unread = 0;
+
+      renderMessages(conv.messages);
+      renderConversationList(searchInput.value);
+
+      if (window.innerWidth <= 768) {
+        sidebar.classList.add('sidebar-hidden');
+      }
+
+      setTimeout(() => {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }, 50);
+    }
+
+    function renderMessages(messages) {
+      chatMessages.innerHTML = messages.map(msg => {
+        if (msg.type === 'image') {
+          return `
+            <div class="message-bubble ${msg.sender === 'me' ? 'sent' : 'received'}">
+              <img src="${msg.content}" class="message-image" onclick="showLightbox('${msg.content}')" onerror="this.style.display='none'">
+              <div class="message-time">${msg.time}</div>
+            </div>
+          `;
+        } else if (msg.type === 'file') {
+          return `
+            <div class="message-bubble ${msg.sender === 'me' ? 'sent' : 'received'}">
+              <div class="message-file">
+                <i class="fas fa-file"></i>
+                <a href="${msg.content}" download="${msg.fileName || 'file'}">${msg.fileName || 'Download file'}</a>
+              </div>
+              <div class="message-time">${msg.time}</div>
+            </div>
+          `;
+        } else {
+          return `
+            <div class="message-bubble ${msg.sender === 'me' ? 'sent' : 'received'}">
+              ${msg.text}
+              <div class="message-time">${msg.time}</div>
+            </div>
+          `;
+        }
+      }).join('');
+      
+      // إعادة ربط أحداث الصور
+      document.querySelectorAll('.message-image').forEach(img => {
+        img.addEventListener('click', () => showLightbox(img.src));
+      });
+    }
+
+    window.showLightbox = showLightbox;
+
+    function addMessage(content, sender = 'me', type = 'text', fileName = '') {
+      if (!activeConversationId) return;
+      const conv = conversations.find(c => c.id === activeConversationId);
+      if (!conv) return;
+
+      const newMsg = {
+        sender,
+        type,
+        content,
+        fileName,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+      
+      if (type === 'text') {
+        newMsg.text = content;
+        conv.lastMessage = content;
+      } else if (type === 'image') {
+        conv.lastMessage = '📷 Image';
+      } else if (type === 'file') {
+        conv.lastMessage = `📎 ${fileName || 'File'}`;
+      }
+      
+      conv.messages.push(newMsg);
+      
+      renderMessages(conv.messages);
+      renderConversationList(searchInput.value);
+      
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function simulateReply() {
+      if (!activeConversationId) return;
+      const conv = conversations.find(c => c.id === activeConversationId);
+      if (!conv) return;
+
+      const typingDiv = document.createElement('div');
+      typingDiv.className = 'typing-indicator';
+      typingDiv.id = 'typingIndicator';
+      typingDiv.innerHTML = `${conv.name} is typing <i class="fas fa-circle"></i><i class="fas fa-circle"></i><i class="fas fa-circle"></i>`;
+      chatMessages.appendChild(typingDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+
+      typingTimeout = setTimeout(() => {
+        document.getElementById('typingIndicator')?.remove();
+        const replies = ["Sure!", "Let me check.", "Sounds good.", "I'll get back to you."];
+        addMessage(replies[Math.floor(Math.random() * replies.length)], 'them', 'text');
+      }, 2000);
+    }
+
+    function handleSendMessage() {
+      const text = messageInput.value.trim();
+      if (!text || !activeConversationId) return;
+      
+      addMessage(text, 'me', 'text');
+      messageInput.value = '';
+      
+      if (typingTimeout) clearTimeout(typingTimeout);
+      setTimeout(() => simulateReply(), 800);
+    }
+
+    // ========== معالجة الملفات ==========
+    attachBtn.addEventListener('click', () => {
+      fileInput.click();
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      const files = Array.from(e.target.files);
+      if (!files.length || !activeConversationId) return;
+
+      files.forEach(file => {
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            addMessage(ev.target.result, 'me', 'image');
+          };
+          reader.readAsDataURL(file);
+        } else {
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            addMessage(ev.target.result, 'me', 'file', file.name);
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+      
+      fileInput.value = '';
+      
+      if (typingTimeout) clearTimeout(typingTimeout);
+      setTimeout(() => simulateReply(), 1000);
+    });
+
+    // ========== URL Parameter ==========
+    function handleUrlParams() {
+      const params = new URLSearchParams(window.location.search);
+      const targetUser = params.get('user') || params.get('seller');
+      const targetProduct = params.get('product');
+
+      if (targetUser) {
+        let targetConv = conversations.find(c => 
+          c.name.toLowerCase().includes(targetUser.toLowerCase())
+        );
+        
+        if (!targetConv) {
+          const newConv = {
+            id: Date.now(),
+            name: targetUser,
+            avatar: targetUser.charAt(0).toUpperCase(),
+            product: targetProduct || 'New conversation',
+            lastMessage: 'Start messaging...',
+            time: 'Now',
+            unread: 0,
+            messages: []
+          };
+          conversations.push(newConv);
+          targetConv = newConv;
+        }
+        
+        openConversation(targetConv.id);
+        if (targetProduct) {
+          activeProduct.innerHTML = `<i class="fas fa-tag"></i> ${targetProduct}`;
+        }
+        renderConversationList();
+      }
+    }
+
+    // ========== Mobile Back ==========
+    mobileBackBtn.addEventListener('click', () => {
+      if (window.innerWidth <= 768) {
+        sidebar.classList.remove('sidebar-hidden');
+        chatContent.style.display = 'none';
+        emptyState.style.display = 'flex';
+        activeConversationId = null;
+        renderConversationList(searchInput.value);
+      }
+    });
+
+    // ========== Search ==========
+    searchInput.addEventListener('input', (e) => {
+      renderConversationList(e.target.value);
+    });
+
+    sendBtn.addEventListener('click', handleSendMessage);
+    messageInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') handleSendMessage();
+    });
+
+    // ========== بدء التشغيل ==========
+    function init() {
+      renderConversationList();
+      handleUrlParams();
+      
+      if (!activeConversationId) {
+        emptyState.style.display = 'flex';
+        chatContent.style.display = 'none';
+        attachBtn.disabled = true;
+      }
+    }
+
+    init();
+
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 768) {
+        sidebar.classList.remove('sidebar-hidden');
+      } else {
+        if (!activeConversationId) {
+          sidebar.classList.remove('sidebar-hidden');
+        }
+      }
+    });
+
+  })();
+</script>
+</body>
+</html>

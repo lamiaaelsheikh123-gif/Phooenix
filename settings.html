@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <title>Phoenix · Settings</title>
+  <!-- Fonts & Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <style>
+    /* ========== المتغيرات والأساسيات ========== */
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+    :root {
+      --bg: #f9fafc; --surface: #ffffff; --text-primary: #1e1e2f; --text-secondary: #4a4a5e;
+      --accent-1: #ff8a4c; --accent-2: #ff6b2b; --gradient: linear-gradient(135deg, #ff8a4c, #ff4d4d);
+      --border: #eaeef2; --shadow: 0 20px 30px -10px rgba(0,0,0,0.05); --glow: rgba(255,110,64,0.4);
+      --navbar-bg: rgba(255,255,255,0.8); --divider-color: #eaeef2; --danger: #e74c3c;
+    }
+    body.dark {
+      --bg: #12121a; --surface: #1e1e2a; --text-primary: #f0f0fa; --text-secondary: #b0b0c0;
+      --accent-1: #ff9f6e; --accent-2: #ff7b3f; --gradient: linear-gradient(135deg, #ff9f6e, #ff5e5e);
+      --border: #333344; --shadow: 0 20px 30px -10px rgba(0,0,0,0.7); --glow: rgba(255,140,80,0.6);
+      --navbar-bg: rgba(30,30,42,0.9); --divider-color: #333344; --danger: #ff6b6b;
+    }
+    body { background: var(--bg); color: var(--text-primary); line-height: 1.5; transition: 0.3s; min-height: 100vh; display: flex; flex-direction: column; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; width: 100%; flex: 1; }
+
+    /* ===== NAVBAR (موحّد) ===== */
+    nav {
+      position: sticky; top: 0; backdrop-filter: blur(12px); background: var(--navbar-bg);
+      border-bottom: 1px solid var(--border); z-index: 100; padding: 0.5rem 1.5rem;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .logo-area { display: flex; align-items: center; gap: 0.3rem; }
+    .logo-area img { height: 40px; width: auto; border-radius: 8px; }
+    .logo-text h2 { font-size: 1.2rem; font-weight: 700; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .logo-text span { font-size: 0.7rem; color: var(--text-secondary); display: block; }
+    .nav-links { display: flex; gap: 1.5rem; }
+    .nav-links a { text-decoration: none; color: var(--text-primary); font-weight: 500; transition: 0.2s; }
+    .nav-links a:hover { color: var(--accent-1); }
+    .nav-right { display: flex; align-items: center; gap: 0.8rem; position: relative; }
+    .nav-icon { font-size: 1.2rem; color: var(--text-primary); cursor: pointer; transition: 0.2s; }
+    .nav-icon:hover { color: var(--accent-1); }
+    .theme-toggle { background: none; border: none; color: var(--text-primary); font-size: 1.2rem; cursor: pointer; }
+    .profile-badge {
+      display: flex; align-items: center; justify-content: center; background: var(--surface);
+      border-radius: 50%; width: 40px; height: 40px; border: 1px solid var(--border);
+      cursor: pointer; text-decoration: none; color: var(--text-primary); font-weight: 600;
+    }
+    .logout-btn {
+      background: transparent; border: 1px solid var(--accent-1); color: var(--accent-1);
+      padding: 0.3rem 0.9rem; border-radius: 40px; font-weight: 600; cursor: pointer;
+    }
+    .logout-btn:hover { background: var(--accent-1); color: white; box-shadow: 0 0 15px var(--glow); }
+    .hamburger { display: none; font-size: 1.5rem; cursor: pointer; color: var(--text-primary); }
+    .sidebar { /* ... نفس الستايل السابق ... */ position: fixed; top: 0; left: -100%; width: 250px; height: 100vh; background: var(--surface); border-right: 1px solid var(--border); padding: 2rem 1rem; transition: 0.3s; z-index: 200; }
+    .sidebar.open { left: 0; }
+    .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 150; display: none; }
+    .overlay.active { display: block; }
+
+    /* Dropdowns */
+    .notification-wrapper, .message-wrapper { position: relative; display: inline-flex; align-items: center; }
+    .notification-badge, .message-badge { display: none; }
+    .notification-dropdown, .message-dropdown {
+      position: absolute; top: calc(100% + 8px); right: 0; width: 360px; max-width: 90vw;
+      background: var(--surface); border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      border: 1px solid var(--border); z-index: 1001; display: none; flex-direction: column; overflow: hidden;
+    }
+    .notification-dropdown.show, .message-dropdown.show { display: flex; }
+    .dropdown-header { display: flex; justify-content: space-between; padding: 1rem 1.2rem; border-bottom: 1px solid var(--border); }
+    .dropdown-footer { padding: 0.8rem; text-align: center; border-top: 1px solid var(--border); }
+
+    /* ===== محتوى الإعدادات ===== */
+    .settings-layout { display: flex; gap: 2rem; margin: 2rem 0; }
+    .settings-sidebar {
+      width: 260px; background: var(--surface); border-radius: 24px; padding: 1.5rem 0;
+      border: 1px solid var(--border); box-shadow: var(--shadow); height: fit-content;
+    }
+    .settings-nav-item {
+      display: flex; align-items: center; gap: 1rem; padding: 1rem 1.5rem;
+      color: var(--text-secondary); cursor: pointer; transition: 0.2s;
+      border-left: 3px solid transparent;
+    }
+    .settings-nav-item.active { background: rgba(255,138,76,0.1); color: var(--accent-1); border-left-color: var(--accent-1); }
+    .settings-nav-item:hover { background: var(--bg); }
+    .settings-content { flex: 1; background: var(--surface); border-radius: 24px; padding: 2rem; border: 1px solid var(--border); box-shadow: var(--shadow); }
+    .section-title { font-size: 1.4rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; color: var(--accent-1); }
+    .settings-card { background: var(--bg); border-radius: 20px; padding: 1.5rem; margin-bottom: 2rem; border: 1px solid var(--border); }
+    .form-group { margin-bottom: 1.2rem; }
+    .form-group label { display: block; margin-bottom: 0.3rem; font-weight: 500; }
+    .form-group input { width: 100%; padding: 0.8rem 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: 30px; color: var(--text-primary); }
+    .toggle-item { display: flex; justify-content: space-between; align-items: center; padding: 0.8rem 0; }
+    .btn { background: var(--gradient); color: white; border: none; padding: 0.7rem 1.8rem; border-radius: 40px; font-weight: 600; cursor: pointer; }
+    .btn-outline { background: transparent; border: 2px solid var(--accent-1); color: var(--accent-1); }
+    .danger-btn { background: transparent; border: 1px solid var(--danger); color: var(--danger); }
+    .danger-btn:hover { background: var(--danger); color: white; }
+
+    /* ===== FOOTER & CHATBOT ===== */
+    .simple-footer { margin-top: 3rem; padding: 1.5rem; text-align: center; border-top: 1px solid var(--divider-color); color: var(--text-secondary); }
+    .simple-footer a { color: var(--accent-1); text-decoration: none; }
+    .chatbot { position: fixed; bottom: 20px; right: 20px; z-index: 999; display: flex; flex-direction: column; align-items: center; }
+    .chat-circle { width: 56px; height: 56px; background: linear-gradient(145deg, #ff9f4a, #ff4d2e); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; animation: float-glow 2.2s infinite; }
+    .chat-circle img { width: 46px; height: 46px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,255,255,0.6); }
+    @keyframes float-glow { 0% { transform: translateY(0px); } 50% { transform: translateY(-6px); } 100% { transform: translateY(0px); } }
+    .chat-label { background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); color: #ffaa66; font-size: 0.65rem; padding: 3px 8px; border-radius: 30px; margin-top: 6px; cursor: pointer; }
+    .chat-box { position: absolute; bottom: 80px; right: 0; width: 90vw; max-width: 450px; height: 500px; background: rgba(255,255,255,0.75); backdrop-filter: blur(16px); border-radius: 28px; border: 1px solid rgba(255,255,255,0.3); display: none; flex-direction: column; overflow: hidden; }
+    body.dark .chat-box { background: rgba(30,30,42,0.85); }
+    .chat-box.show { display: flex; }
+    .chat-header { padding: 1rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
+    .chat-messages { flex: 1; padding: 1rem; overflow-y: auto; }
+    .chat-message { max-width: 85%; padding: 8px 14px; border-radius: 20px; background: var(--surface); margin-bottom: 8px; }
+    .chat-message.bot { background: var(--gradient); color: white; }
+    .chat-input-area { display: flex; padding: 10px; gap: 8px; border-top: 1px solid var(--border); }
+    .chat-input-area textarea { flex: 1; background: var(--surface); border: none; border-radius: 40px; padding: 8px; }
+    .chat-input-area button { background: var(--gradient); border: none; border-radius: 40px; padding: 0 18px; color: white; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .nav-links, .nav-right .theme-toggle, .nav-right .notification-wrapper, .nav-right .message-wrapper, .nav-right .profile-badge, .nav-right .logout-btn { display: none; }
+      .hamburger { display: block; }
+      .settings-layout { flex-direction: column; }
+      .settings-sidebar { width: 100%; display: flex; overflow-x: auto; padding: 0.5rem; }
+      .settings-nav-item { border-left: none; border-bottom: 3px solid transparent; white-space: nowrap; }
+      .settings-nav-item.active { border-bottom-color: var(--accent-1); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ========== NAVBAR ========== -->
+<nav>
+  <div class="logo-area"><img src="photo_2026-02-17_19-01-20.jpg" alt="Phoenix"><div class="logo-text"><h2>Phoenix</h2><span>donate & trade</span></div></div>
+  <div class="nav-links"><a href="dashboard.html">Home</a><a href="market.html">Market</a><a href="donate.html">Donate</a><a href="sell.html">Sell</a></div>
+  <div class="nav-right">
+    <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
+    <div class="notification-wrapper"><i class="fas fa-bell nav-icon" id="notificationBell"></i><span class="notification-badge">0</span></div>
+    <div class="message-wrapper"><i class="fas fa-comment-dots nav-icon" id="messageIcon"></i><span class="message-badge">0</span></div>
+    <a href="profile.html" class="profile-badge" id="profileBadge">U</a>
+    <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    <span class="hamburger" id="hamburger">☰</span>
+  </div>
+</nav>
+
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+  <div class="close-btn" id="closeSidebar">✕</div>
+  <ul style="list-style:none;">
+    <li><a href="dashboard.html"><i class="fas fa-home"></i> Home</a></li>
+    <li><a href="market.html"><i class="fas fa-store"></i> Market</a></li>
+    <li><a href="donate.html"><i class="fas fa-hand-holding-heart"></i> Donate</a></li>
+    <li><a href="sell.html"><i class="fas fa-tags"></i> Sell</a></li>
+    <li><a href="profile.html"><i class="fas fa-user"></i> Profile</a></li>
+    <li><a href="favourites.html"><i class="fas fa-heart"></i> Favorites</a></li>
+    <li><button id="sidebarDarkMode"><i class="fas fa-moon"></i> Dark Mode</button></li>
+    <li><button id="sidebarLogout"><i class="fas fa-sign-out-alt"></i> Logout</button></li>
+  </ul>
+</div>
+<div class="overlay" id="overlay"></div>
+
+<main class="container">
+  <div class="settings-layout">
+    <!-- القائمة الجانبية -->
+    <div class="settings-sidebar">
+      <div class="settings-nav-item active" data-section="profile"><i class="fas fa-user-circle"></i> Profile</div>
+      <div class="settings-nav-item" data-section="security"><i class="fas fa-shield-alt"></i> Security</div>
+      <div class="settings-nav-item" data-section="notifications"><i class="fas fa-bell"></i> Notifications</div>
+      <div class="settings-nav-item" data-section="account"><i class="fas fa-cog"></i> Account</div>
+    </div>
+    <!-- المحتوى الديناميكي -->
+    <div class="settings-content" id="settingsContent"></div>
+  </div>
+</main>
+
+<footer class="simple-footer">Copyright © 2026 Phoenix — <a href="about.html">About</a></footer>
+
+<!-- Chatbot -->
+<div class="chatbot">
+  <div class="chat-circle" id="chatIcon"><img src="photo_2026-02-17_19-01-20.jpg" alt="AI"></div>
+  <span class="chat-label" id="chatLabel">Ask AI</span>
+  <div class="chat-box" id="chatBox">
+    <div class="chat-header"><h4><i class="fas fa-feather-alt"></i> Phoenix AI</h4><button class="close-chat" id="closeChatBtn">✕</button></div>
+    <div class="chat-messages" id="chatMessages"><div class="chat-message bot">👋 Hi! How can I help?</div></div>
+    <div class="chat-input-area"><textarea id="chatInput" placeholder="Type..."></textarea><button id="sendChat">Send</button></div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    // ---------- بيانات المستخدم ----------
+    let user = JSON.parse(localStorage.getItem('currentUser')) || { firstName:'User' };
+    if (!user) window.location.href = 'sign.html';
+    const displayName = `${user.firstName||''} ${user.lastName||''}`.trim() || 'User';
+    document.getElementById('profileBadge').textContent = displayName.charAt(0).toUpperCase();
+
+    // ---------- Dark Mode ----------
+    const themeToggle = document.getElementById('themeToggle');
+    const sidebarDarkBtn = document.getElementById('sidebarDarkMode');
+    function toggleDark() {
+      document.body.classList.toggle('dark');
+      const icon = themeToggle.querySelector('i');
+      icon.classList.toggle('fa-moon'); icon.classList.toggle('fa-sun');
+      if (sidebarDarkBtn) sidebarDarkBtn.innerHTML = document.body.classList.contains('dark') ? '<i class="fas fa-sun"></i> Dark Mode' : '<i class="fas fa-moon"></i> Dark Mode';
+      localStorage.setItem('phoenix-theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+    }
+    themeToggle.addEventListener('click', toggleDark);
+    if (sidebarDarkBtn) sidebarDarkBtn.addEventListener('click', toggleDark);
+    if (localStorage.getItem('phoenix-theme') === 'dark') { document.body.classList.add('dark'); themeToggle.querySelector('i').classList.add('fa-sun'); }
+
+    // ---------- Sidebar & Logout ----------
+    const hamburger = document.getElementById('hamburger');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    function openSidebar(){ sidebar.classList.add('open'); overlay.classList.add('active'); }
+    function closeSidebar(){ sidebar.classList.remove('open'); overlay.classList.remove('active'); }
+    hamburger.addEventListener('click', openSidebar);
+    document.getElementById('closeSidebar').addEventListener('click', closeSidebar);
+    overlay.addEventListener('click', closeSidebar);
+    function logout(){ if(confirm('Logout?')){ localStorage.removeItem('currentUser'); window.location.href='index.html'; } }
+    document.getElementById('logoutBtn').addEventListener('click', logout);
+    document.getElementById('sidebarLogout').addEventListener('click', logout);
+
+    // ---------- Dropdowns (إشعارات ورسائل) ----------
+    // (نفس كود الـ dropdowns الموجود في باقي الصفحات - اختصاراً للطول)
+    function initDropdowns() { /* ... نفس الكود السابق ... */ }
+    initDropdowns();
+
+    // ---------- محتوى الإعدادات (تبديل الأقسام) ----------
+    const contentDiv = document.getElementById('settingsContent');
+    const navItems = document.querySelectorAll('.settings-nav-item');
+    
+    function renderSection(section) {
+      if (section === 'profile') {
+        contentDiv.innerHTML = `
+          <div class="section-title"><i class="fas fa-user-circle"></i> Edit Profile</div>
+          <div class="settings-card">
+            <div style="display:flex; align-items:center; gap:1.5rem; margin-bottom:1.5rem;">
+              <img src="${user.avatar || 'https://ui-avatars.com/api/?name='+encodeURIComponent(displayName)+'&background=ff8a4c&color=fff'}" style="width:80px; height:80px; border-radius:50%; border:3px solid var(--accent-1);">
+              <div><button class="btn-outline" style="padding:0.5rem 1.5rem;" id="changeAvatarBtn"><i class="fas fa-camera"></i> Change Photo</button><input type="file" id="avatarInput" accept="image/*" style="display:none"></div>
+            </div>
+            <div class="form-group"><label>Full Name</label><input type="text" id="fullName" value="${displayName}"></div>
+            <div class="form-group"><label>Location</label><input type="text" id="location" value="${user.location||''}"></div>
+            <div class="form-group"><label>Bio</label><textarea id="bio" rows="2" style="width:100%; padding:0.8rem; border-radius:20px; background:var(--surface); border:1px solid var(--border);">${user.bio||''}</textarea></div>
+            <button class="btn" id="saveProfileBtn">Save Changes</button>
+          </div>
+        `;
+        document.getElementById('changeAvatarBtn').addEventListener('click', ()=> document.getElementById('avatarInput').click());
+        document.getElementById('avatarInput').addEventListener('change', (e) => { /* منطق رفع الصورة */ });
+        document.getElementById('saveProfileBtn').addEventListener('click', () => { /* حفظ التعديلات */ });
+      } else if (section === 'security') {
+        contentDiv.innerHTML = `
+          <div class="section-title"><i class="fas fa-shield-alt"></i> Security</div>
+          <div class="settings-card"><h3>Change Password</h3><div class="form-group"><label>Current Password</label><input type="password"></div><div class="form-group"><label>New Password</label><input type="password"></div><div class="form-group"><label>Confirm Password</label><input type="password"></div><button class="btn">Update Password</button></div>
+          <div class="settings-card"><h3>Email Address</h3><div class="form-group"><label>Email</label><input type="email" value="${user.email||''}"></div><button class="btn">Update Email</button></div>
+          <div class="settings-card"><h3>Login Activity</h3><p><i class="fas fa-laptop"></i> Cairo, Egypt · Just now</p></div>
+        `;
+      } else if (section === 'notifications') {
+        contentDiv.innerHTML = `
+          <div class="section-title"><i class="fas fa-bell"></i> Notifications</div>
+          <div class="settings-card">
+            <div class="toggle-item"><span>Chat Sounds</span><input type="checkbox" checked></div>
+            <div class="toggle-item"><span>System Notifications</span><input type="checkbox" checked></div>
+            <div class="toggle-item"><span>Email Updates</span><input type="checkbox"></div>
+            <div class="toggle-item"><span>Dark Mode</span><button class="btn-outline" id="toggleDarkBtn">Toggle Dark Mode</button></div>
+            <div class="form-group"><label>Language</label><select style="padding:0.8rem; border-radius:30px;"><option>English</option><option>Arabic</option></select></div>
+          </div>
+        `;
+        document.getElementById('toggleDarkBtn').addEventListener('click', toggleDark);
+      } else if (section === 'account') {
+        contentDiv.innerHTML = `
+          <div class="section-title"><i class="fas fa-cog"></i> Account Control</div>
+          <div class="settings-card"><button class="btn-outline"><i class="fas fa-download"></i> Download My Data</button></div>
+          <div class="settings-card" style="border-color:var(--danger);"><h3 style="color:var(--danger);">Danger Zone</h3>
+            <div class="toggle-item"><span>Deactivate Account</span><button class="danger-btn">Deactivate</button></div>
+            <div class="toggle-item"><span>Delete Account Permanently</span><button class="danger-btn" id="deleteAccountBtn">Delete</button></div>
+          </div>
+        `;
+        document.getElementById('deleteAccountBtn').addEventListener('click', ()=> { if(confirm('Delete account permanently?')) { localStorage.clear(); window.location.href='index.html'; } });
+      }
+    }
+
+    navItems.forEach(item => item.addEventListener('click', () => {
+      navItems.forEach(i => i.classList.remove('active'));
+      item.classList.add('active');
+      renderSection(item.dataset.section);
+    }));
+    renderSection('profile'); // افتراضي
+
+    // ---------- Chatbot ----------
+    (function(){
+      const chatIcon = document.getElementById('chatIcon');
+      const chatBox = document.getElementById('chatBox');
+      document.getElementById('chatLabel').addEventListener('click', ()=> chatBox.classList.toggle('show'));
+      chatIcon.addEventListener('click', ()=> chatBox.classList.toggle('show'));
+      document.getElementById('closeChatBtn').addEventListener('click', ()=> chatBox.classList.remove('show'));
+      // باقي منطق الشات...
+    })();
+  })();
+</script>
+</body>
+</html>

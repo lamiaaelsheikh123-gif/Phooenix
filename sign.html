@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Phoenix · Sign In</title>
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        :root {
+            --bg: #f5f7fa;
+            --surface: #ffffff;
+            --text-primary: #1e1e2f;
+            --text-secondary: #4a4a5e;
+            --accent-1: #ff8a4c;
+            --accent-2: #ff6b2b;
+            --gradient: linear-gradient(135deg, #ff8a4c, #ff4d4d);
+            --border-light: #ddd;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            --glow: rgba(255, 110, 64, 0.4);
+            --input-bg: #ffffff;
+            --card-bg: #ffffff;
+            --navbar-bg: rgba(255, 255, 255, 0.9);
+            --error: #e53e3e;
+            --error-bg: #fee2e2;
+        }
+
+        body.dark {
+            --bg: #12121a;
+            --surface: #1e1e2a;
+            --text-primary: #f0f0fa;
+            --text-secondary: #b0b0c0;
+            --accent-1: #ff9f6e;
+            --accent-2: #ff7b3f;
+            --gradient: linear-gradient(135deg, #ff9f6e, #ff5e5e);
+            --border-light: #3a3a4a;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            --glow: rgba(255, 140, 80, 0.5);
+            --input-bg: #252533;
+            --card-bg: #1e1e2a;
+            --navbar-bg: rgba(30, 30, 42, 0.9);
+            --error: #fc8181;
+            --error-bg: #3a2a2a;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-primary);
+            line-height: 1.5;
+            transition: background-color 0.3s, color 0.2s;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== NAVBAR ===== */
+        .nav-mini {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: var(--navbar-bg);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-light);
+            position: relative;
+            z-index: 10;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo-area img {
+            height: 52px;
+            width: auto;
+            border-radius: 12px;
+        }
+
+        .logo-text h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-text span {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .theme-toggle:hover {
+            transform: rotate(15deg);
+        }
+
+        /* ===== SIGN IN CARD ===== */
+        .signin-container {
+            display: flex;
+            flex: 1;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .signin-card {
+            max-width: 480px;
+            width: 100%;
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-light);
+            padding: 2.5rem 2rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .signin-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1);
+        }
+
+        .form-side h3 {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .form-side .subhead {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-size: 1rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 0.9rem 1.2rem;
+            background: var(--input-bg);
+            border: 1px solid var(--border-light);
+            border-radius: 15px;
+            font-size: 1rem;
+            color: var(--text-primary);
+            transition: all 0.2s;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--accent-1);
+            box-shadow: 0 0 0 3px var(--glow);
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrapper .input-field {
+            padding-right: 3rem;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 1.2rem;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .row-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 1rem 0 2rem;
+            font-size: 0.95rem;
+        }
+
+        .remember {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        .remember input {
+            accent-color: var(--accent-1);
+        }
+
+        .forgot a {
+            color: var(--accent-1);
+            text-decoration: none;
+            font-weight:500;
+        }
+
+        .forgot a:hover {
+            opacity: 0.8;
+            text-decoration: underline;
+        }
+
+        .error-message {
+            background: var(--error-bg);
+            color: var(--error);
+            font-size: 0.9rem;
+            padding: 0.8rem 1rem;
+            border-radius: 15px;
+            margin: 0.5rem 0 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: opacity 0.3s, transform 0.3s;
+            border: 1px solid var(--error);
+        }
+
+        .error-message.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .btn-signin {
+            width: 100%;
+            background: var(--gradient);
+            color: white;
+            border: none;
+            padding: 0.9rem;
+            border-radius: 15px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.25s;
+            box-shadow: 0 4px 14px var(--glow);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-signin:hover:not(:disabled) {
+            transform: scale(1.02);
+            box-shadow: 0 8px 25px var(--glow);
+        }
+
+        .btn-signin:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .spinner {
+            width: 1.2rem;
+            height: 1.2rem;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: inline-block;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .or-divider {
+            text-align: center;
+            position: relative;
+            margin: 1.5rem 0;
+        }
+
+        .or-divider span {
+            background: var(--card-bg);
+            padding: 0 1rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .or-divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--border-light);
+            z-index: 1;
+        }
+
+        .google-btn {
+            width: 100%;
+            background: transparent;
+            border: 1px solid var(--border-light);
+            color: var(--text-primary);
+            padding: 0.9rem;
+            border-radius: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 2rem;
+        }
+
+        .google-btn:hover {
+            background: var(--surface);
+            border-color: var(--accent-1);
+            transform: translateY(-2px);
+        }
+
+        .google-btn img {
+            width: 1.2rem;
+            height: 1.2rem;
+        }
+
+        .create-account {
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        .create-account a {
+            color: var(--accent-1);
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .create-account a:hover {
+            text-decoration: underline;
+        }
+
+        .footer-note {
+            text-align: center;
+            margin-top: 2rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .nav-mini { padding: 0.8rem 1rem; }
+            .logo-area img { height: 44px; }
+            .logo-text h2 { font-size: 1.3rem; }
+            .logo-text span { display: none; }
+            .signin-container { padding: 1rem; }
+            .signin-card { padding: 1.8rem 1.2rem; }
+            .input-field { padding: 0.8rem 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== NAVBAR ===== -->
+    <div class="nav-mini">
+        <div class="logo-area">
+            <img src="photo_2026-02-17_19-01-20.jpg" alt="Phoenix">
+            <div class="logo-text">
+                <h2>Phoenix</h2>
+                <span>donate & trade</span>
+            </div>
+        </div>
+        <div class="nav-right">
+            <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
+        </div>
+    </div>
+
+    <!-- ===== SIGN IN CARD ===== -->
+    <div class="signin-container">
+        <div class="signin-card">
+            <div class="form-side">
+                <h3>Sign In</h3>
+                <div class="subhead">Access your account to donate or sell items.</div>
+
+                <form id="signinForm">
+                    <div class="input-group">
+                        <label>Email Address</label>
+                        <input type="email" id="email" class="input-field" placeholder="hello@phoenix.exchange" required autocomplete="email" autofocus>
+                    </div>
+                    <div class="input-group">
+                        <label>Password</label>
+                        <div class="input-wrapper">
+                            <input type="password" id="password" class="input-field" placeholder="Enter password (min. 8 characters)" required minlength="8" autocomplete="current-password">
+                            <button type="button" class="password-toggle" id="togglePassword" aria-label="Show password">
+                                <i class="far fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="row-options">
+                        <label class="remember"><input type="checkbox"> Remember me</label>
+                        <div class="forgot"><a href="forgot-password.html">Forgot Password?</a></div>
+                    </div>
+
+                    <div id="errorMessage" class="error-message">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span></span>
+                    </div>
+
+                    <button type="submit" class="btn-signin" id="signinButton">
+                        <span>Sign In</span>
+                    </button>
+                </form>
+
+                <div class="or-divider"><span>OR</span></div>
+                <button class="google-btn" id="googleBtn">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo">
+                    Continue with Google
+                </button>
+                <div class="create-account">
+                    Don't have an account? <a href="create-account.html">Create an Account</a>
+                </div>
+                <div class="footer-note">Phoenix Exchange System © 2026</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            // ========== 1. Dark Mode (localStorage) ==========
+            const themeToggle = document.getElementById('themeToggle');
+            const themeIcon = themeToggle.querySelector('i');
+
+            function applyTheme(isDark) {
+                document.body.classList.toggle('dark', isDark);
+                themeIcon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+                localStorage.setItem('phoenix-theme', isDark ? 'dark' : 'light');
+            }
+
+            const savedTheme = localStorage.getItem('phoenix-theme') === 'dark';
+            applyTheme(savedTheme);
+
+            themeToggle.addEventListener('click', () => {
+                const isDark = !document.body.classList.contains('dark');
+                applyTheme(isDark);
+            });
+
+            // ========== 2. Password toggle (إظهار/إخفاء) ==========
+            const passwordField = document.getElementById('password');
+            const togglePwd = document.getElementById('togglePassword');
+            togglePwd.addEventListener('click', () => {
+                const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordField.setAttribute('type', type);
+                const eyeIcon = togglePwd.querySelector('i');
+                eyeIcon.classList.toggle('fa-eye');
+                eyeIcon.classList.toggle('fa-eye-slash');
+            });
+
+            // ========== 3. عرض رسائل الخطأ ==========
+            const errorDiv = document.getElementById('errorMessage');
+            const errorSpan = errorDiv.querySelector('span');
+            function showError(message) {
+                errorSpan.textContent = message;
+                errorDiv.classList.add('show');
+                setTimeout(() => errorDiv.classList.remove('show'), 4000);
+            }
+
+            // ========== 4. Loading spinner ==========
+            const signinBtn = document.getElementById('signinButton');
+            function setLoading(isLoading) {
+                if (isLoading) {
+                    signinBtn.disabled = true;
+                    signinBtn.innerHTML = '<span class="spinner"></span> Signing in...';
+                } else {
+                    signinBtn.disabled = false;
+                    signinBtn.innerHTML = '<span>Sign In</span>';
+                }
+            }
+
+            // ========== 5. Core Sign In ==========
+            async function handleSignIn(email, password) {
+                await new Promise(resolve => setTimeout(resolve, 800));
+
+                /*
+                // للاستخدام مع API حقيقي:
+                try {
+                    const response = await fetch('https://your-api.com/auth/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, password })
+                    });
+                    const data = await response.json();
+                    if (!response.ok) throw new Error(data.message || 'Login failed');
+                    localStorage.setItem('currentUser', JSON.stringify(data.user));
+                    window.location.href = 'dashboard.html';
+                } catch (err) {
+                    showError(err.message);
+                    setLoading(false);
+                }
+                */
+
+                // وضع تجريبي باستخدام localStorage
+                const users = JSON.parse(localStorage.getItem('users')) || [];
+                const foundUser = users.find(u => u.email === email && u.password === password);
+                if (!foundUser) {
+                    showError('Invalid email or password.');
+                    setLoading(false);
+                    return false;
+                }
+                localStorage.setItem('currentUser', JSON.stringify(foundUser));
+                window.location.href = 'dashboard.html';
+                return true;
+            }
+
+            // ========== 6. إرسال النموذج ==========
+            const form = document.getElementById('signinForm');
+            const emailInput = document.getElementById('email');
+
+            form.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                errorDiv.classList.remove('show');
+
+                const email = emailInput.value.trim();
+                const password = passwordField.value;
+
+                if (!email || !password) {
+                    showError('Please enter both email and password.');
+                    return;
+                }
+                if (password.length < 8) {
+                    showError('Password must be at least 8 characters.');
+                    return;
+                }
+
+                setLoading(true);
+                await handleSignIn(email, password);
+            });
+
+            // ========== 7. زر Google التجريبي ==========
+            document.getElementById('googleBtn').addEventListener('click', () => {
+                alert('Google authentication will be integrated soon.\nDemo: use email "demo@phoenix.exchange" with any 8+ char password after creating an account.');
+            });
+
+            // if (localStorage.getItem('currentUser')) window.location.href = 'dashboard.html';
+        })();
+    </script>
+</body>
+</html>

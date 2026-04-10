@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <title>Phoenix · Donate & Trade</title>
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- Google Fonts: Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <style>
+    /* ========== جميع الأنماط كما أرسلتها بالضبط (لم يتم تغييرها) ========== */
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+    :root {
+      --bg: #f9fafc; --surface: #ffffff; --text-primary: #1e1e2f; --text-secondary: #4a4a5e;
+      --accent-1: #ff8a4c; --accent-2: #ff6b2b; --gradient: linear-gradient(135deg, #ff8a4c, #ff4d4d);
+      --border: #eaeef2; --shadow: 0 20px 30px -10px rgba(0,0,0,0.05); --glow: rgba(255,110,64,0.4);
+      --navbar-bg: rgba(255,255,255,0.8); --footer-bg: #1e1e2f; --footer-text: #f0f0fa;
+      --special-gradient: linear-gradient(145deg, #000000, #ff6b2b, #ff8a4c, #ff4d4d);
+      --badge-bg: #ffefe2; --badge-text: #b95b1d; --filter-bg: #ffffff;
+      --filter-hover: #f8f9fc; --divider-color: #eaeef2;
+    }
+    body.dark {
+      --bg: #12121a; --surface: #1e1e2a; --text-primary: #f0f0fa; --text-secondary: #b0b0c0;
+      --accent-1: #ff9f6e; --accent-2: #ff7b3f; --gradient: linear-gradient(135deg, #ff9f6e, #ff5e5e);
+      --border: #333344; --shadow: 0 20px 30px -10px rgba(0,0,0,0.7); --glow: rgba(255,140,80,0.6);
+      --navbar-bg: rgba(30,30,42,0.9); --footer-bg: #0b0b12; --footer-text: #ddddff;
+      --special-gradient: linear-gradient(145deg, #111111, #ff7b3f, #ff9f6e, #ff5e5e);
+      --badge-bg: #3a2a1f; --badge-text: #ffb68b; --filter-bg: #252533;
+      --filter-hover: #2a2a3a; --divider-color: #333344;
+    }
+    body {
+      background-color: var(--bg); color: var(--text-primary); line-height: 1.5;
+      transition: background-color 0.3s, color 0.2s; position: relative;
+      overflow-x: hidden; min-height: 100vh;
+    }
+    body::before {
+      content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background-image: radial-gradient(circle at 10% 30%, rgba(255,140,64,0.03) 0%, transparent 25%),
+        radial-gradient(circle at 90% 70%, rgba(255,100,100,0.03) 0%, transparent 30%);
+      pointer-events: none; z-index: -1;
+    }
+    .container { max-width: 1280px; margin: 0 auto; padding: 0 1rem; }
+    /* ========== NAVBAR ========== */
+    nav {
+      position: sticky; top: 0; backdrop-filter: blur(12px); background: var(--navbar-bg);
+      border-bottom: 1px solid var(--border); z-index: 100; padding: 0.5rem 1rem;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .logo-area { display: flex; align-items: center; gap: 0.3rem; }
+    .logo-area img { height: 40px; width: auto; border-radius: 8px; }
+    .logo-text h2 {
+      font-size: 1.2rem; font-weight: 700; background: var(--gradient);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1.1;
+    }
+    .logo-text span { font-size: 0.7rem; color: var(--text-secondary); display: block; }
+    .nav-links { display: none; gap: 1.5rem; }
+    .nav-links a {
+      text-decoration: none; color: var(--text-primary); font-weight: 500;
+      font-size: 1rem; transition: 0.2s;
+    }
+    .nav-links a:hover { color: var(--accent-1); }
+    .nav-links .app-link { font-weight: 700; color: var(--accent-1); text-shadow: 0 0 5px var(--glow); }
+    .app-link-mobile {
+      font-weight: 700; color: var(--accent-1); font-size: 0.9rem; margin-left: auto;
+      margin-right: 0.5rem; white-space: nowrap; text-decoration: none;
+    }
+    .nav-right { display: flex; align-items: center; gap: 0.8rem; }
+    .sign-in-btn {
+      background: transparent; border: 1px solid var(--accent-1); color: var(--accent-1);
+      padding: 0.5rem 1.2rem; border-radius: 40px; font-weight: 600; font-size: 0.9rem;
+      cursor: pointer; transition: 0.2s; text-decoration: none; display: inline-block;
+      white-space: nowrap; margin-left: 0.5rem;
+    }
+    .sign-in-btn:hover { background: var(--accent-1); color: white; box-shadow: 0 0 15px var(--glow); }
+    .theme-toggle { background: none; border: none; color: var(--text-primary); font-size: 1.2rem; cursor: pointer; }
+    .hamburger { display: block; font-size: 1.5rem; cursor: pointer; color: var(--text-primary); margin-left: 0.5rem; }
+    .sidebar {
+      position: fixed; top: 0; left: -100%; width: 250px; height: 100vh; background: var(--surface);
+      border-right: 1px solid var(--border); padding: 2rem 1rem; transition: left 0.3s ease;
+      z-index: 200; box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    }
+    .sidebar.open { left: 0; }
+    .sidebar .close-btn { text-align: right; margin-bottom: 2rem; font-size: 1.5rem; cursor: pointer; }
+    .sidebar ul { list-style: none; }
+    .sidebar li { margin-bottom: 1.2rem; }
+    .sidebar a, .sidebar button {
+      text-decoration: none; color: var(--text-primary); font-weight: 500;
+      font-size: 1.1rem; display: flex; align-items: center; gap: 0.8rem;
+      background: none; border: none; width: 100%; text-align: left; cursor: pointer;
+    }
+    .sidebar a:hover, .sidebar button:hover { color: var(--accent-1); }
+    .overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5); z-index: 150; display: none;
+    }
+    .overlay.active { display: block; }
+    /* ===== HERO ===== */
+    .hero { padding: 2.5rem 0 1.5rem; text-align: center; }
+    .hero h1 { font-size: 2rem; font-weight: 700; line-height: 1.4; max-width: 900px; margin: 0 auto; }
+    .hero h1 .line1 { display: block; color: #000000; }
+    body.dark .hero h1 .line1 { color: #ffffff; }
+    .hero h1 .line2 {
+      display: block; background: var(--special-gradient);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .hero p { font-size: 1rem; color: var(--text-secondary); margin: 1rem 0 2rem; }
+    .hero-buttons { display: flex; gap: 0.8rem; justify-content: center; flex-wrap: wrap; }
+    .btn-glow, .btn-outline-glow {
+      padding: 0.7rem 1.8rem; border-radius: 40px; font-weight: 600; font-size: 0.95rem;
+      text-decoration: none; display: inline-block; transition: 0.2s; cursor: pointer;
+    }
+    .btn-glow { background: var(--gradient); color: white; box-shadow: 0 4px 14px var(--glow); }
+    .btn-outline-glow {
+      background: transparent; border: 2px solid var(--accent-1); color: var(--accent-1);
+    }
+    /* ===== Search Bar ===== */
+    .search-bar {
+      max-width: 600px; margin: 1.5rem auto 1rem; display: flex; background: var(--surface);
+      border: 1px solid var(--border); border-radius: 60px; padding: 0.3rem 0.3rem 0.3rem 1.5rem;
+      align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+    }
+    .search-bar input {
+      flex: 1; border: none; background: transparent; padding: 0.8rem 0;
+      font-size: 1rem; color: var(--text-primary); outline: none; min-width: 0;
+    }
+    .search-bar button {
+      background: var(--gradient); border: none; color: white; padding: 0.8rem 1.5rem;
+      border-radius: 60px; font-weight: 600; cursor: pointer; transition: 0.2s;
+      box-shadow: 0 2px 8px var(--glow); white-space: nowrap;
+    }
+    /* ===== Filter Bar ===== */
+    .filter-bar {
+      width: fit-content; margin: 1.5rem auto; display: flex; flex-wrap: wrap; gap: 0.8rem;
+      background: var(--surface); padding: 0.4rem 0.8rem; border-radius: 60px;
+      border: 1px solid var(--border); align-items: center; justify-content: center;
+    }
+    .filter-group { display: flex; align-items: center; gap: 0.4rem; }
+    .filter-group label { font-weight: 500; color: var(--accent-1); font-size: 0.8rem; }
+    .filter-group select {
+      background: var(--filter-bg); border: 1px solid var(--border); color: var(--text-primary);
+      padding: 0.3rem 1.5rem 0.3rem 0.8rem; border-radius: 40px; font-size: 0.8rem;
+      font-weight: 500; cursor: pointer; outline: none; transition: all 0.2s;
+      appearance: none; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23ff8a4c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+      background-repeat: no-repeat; background-position: right 0.5rem center; background-size: 0.8rem;
+    }
+    .no-results {
+      grid-column: 1 / -1; text-align: center; padding: 3rem; color: var(--text-secondary);
+      font-size: 1.2rem; font-weight: 500; background: var(--surface); border-radius: 40px;
+      border: 1px solid var(--border); margin: 2rem 0;
+    }
+    .section-title { font-size: 1.8rem; margin: 2rem 0 1rem; font-weight: 600; }
+    .section-title span {
+      background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .section-divider { margin: 60px 0; height: 1px; background: var(--divider-color); width: 100%; }
+    /* ===== Product Grid ===== */
+    .product-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; margin: 1rem 0; }
+    .product-card {
+      background: var(--surface); border-radius: 20px; padding: 1rem; border: 1px solid var(--border);
+      transition: all 0.3s ease; cursor: pointer; position: relative;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    }
+    .product-card:hover {
+      transform: translateY(-6px); border-color: var(--accent-1);
+      box-shadow: 0 12px 24px -8px rgba(0,0,0,0.15);
+    }
+    .product-img {
+      width: 100%; height: 140px; border-radius: 14px; margin-bottom: 0.8rem; overflow: hidden;
+      background: linear-gradient(145deg, #ffdab9, #ffe4cd); display: flex;
+      align-items: center; justify-content: center;
+    }
+    .product-img img { width: 100%; height: 100%; object-fit: cover; }
+    .product-badges { display: flex; gap: 0.4rem; margin-bottom: 0.5rem; flex-wrap: wrap; }
+    .badge {
+      background: var(--badge-bg); color: var(--badge-text); padding: 0.2rem 0.6rem;
+      border-radius: 30px; font-size: 0.65rem; font-weight: 600;
+    }
+    .product-title { font-size: 1rem; font-weight: 600; margin-bottom: 0.2rem; }
+    .product-user { font-size: 0.8rem; color: var(--text-secondary); margin: 0.3rem 0; }
+    .product-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem; }
+    .product-value { font-weight: 700; color: var(--accent-2); font-size: 1rem; }
+    .trade-btn {
+      background: var(--gradient); border: none; color: white; padding: 0.4rem 1rem;
+      border-radius: 40px; font-size: 0.8rem; font-weight: 600; cursor: pointer;
+      box-shadow: 0 2px 8px var(--glow); transition: 0.2s;
+    }
+    /* ===== Donate & Sell Cards ===== */
+    .dual-section { display: flex; flex-direction: row; gap: 2rem; margin: 2rem 0; }
+    .dual-card {
+      flex: 1; background: var(--surface); border-radius: 28px; padding: 2rem;
+      border: 1px solid var(--border); transition: 0.3s; text-align: center; box-shadow: var(--shadow);
+    }
+    .dual-card:hover { transform: translateY(-6px); border-color: var(--accent-1); box-shadow: 0 20px 30px -10px var(--glow); }
+    .dual-card i { font-size: 3rem; color: var(--accent-1); margin-bottom: 1rem; }
+    .dual-card h3 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+    .dual-card p { color: var(--text-secondary); margin-bottom: 1.5rem; }
+    /* ===== Testimonials ===== */
+    .testimonial-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; margin: 1.5rem 0; }
+    .testimonial {
+      background: var(--surface); border-radius: 24px; padding: 1.5rem; border: 1px solid var(--border);
+      display: flex; flex-direction: column; gap: 0.5rem;
+    }
+    .testimonial-header { display: flex; align-items: center; gap: 1rem; }
+    .testimonial-avatar { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent-1); }
+    .testimonial-stars { color: #ffb83b; }
+    .testimonial-text { font-style: italic; color: var(--text-secondary); }
+    /* ===== Features ===== */
+    .features-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 1.5rem 0; }
+    .feature-item {
+      background: var(--surface); border-radius: 20px; padding: 1rem; text-align: center;
+      border: 1px solid var(--border); transition: 0.2s;
+    }
+    .feature-icon {
+      font-size: 2rem; background: var(--gradient); -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent; margin-bottom: 0.5rem;
+    }
+    /* ===== App Download ===== */
+    .app-download {
+      background: var(--surface); border-radius: 30px; padding: 2rem 1.5rem;
+      border: 1px solid var(--border); margin: 2rem 0; text-align: center;
+    }
+    .app-buttons { display: flex; flex-direction: column; gap: 0.8rem; margin-top: 1.5rem; }
+    .store-btn {
+      display: inline-block; background: #1e1e2f; color: white; padding: 0.8rem;
+      border-radius: 40px; text-decoration: none; font-weight: 600; transition: 0.2s;
+    }
+    .store-btn:hover { background: var(--accent-1); }
+    /* ===== Footer ===== */
+    .simple-footer {
+      margin-top: 3rem; padding: 1rem; text-align: center; border-top: 1px solid var(--divider-color);
+      color: var(--text-secondary); font-size: 0.8rem;
+    }
+    .simple-footer a { color: var(--accent-1); text-decoration: none; }
+    .simple-footer a:hover { text-decoration: underline; }
+    /* ===== Modal (Login) ===== */
+    .modal {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center;
+      z-index: 1000; visibility: hidden; opacity: 0; transition: 0.2s;
+    }
+    .modal.active { visibility: visible; opacity: 1; }
+    .modal-content {
+      background: var(--surface); padding: 2.2rem 2rem; border-radius: 40px;
+      max-width: 380px; width: 90%; text-align: center; border: 1px solid var(--border);
+    }
+    .modal-buttons { display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem; }
+    .modal-btn {
+      background: var(--gradient); color: white; padding: 0.8rem 2rem; border-radius: 60px;
+      text-decoration: none; font-weight: 600; border: none; cursor: pointer;
+    }
+    .modal-btn.outline { background: transparent; border: 2px solid var(--accent-1); color: var(--accent-1); }
+    /* ===== CHATBOT ===== */
+    .chatbot {
+      position: fixed; bottom: 20px; right: 20px; z-index: 999;
+      display: flex; flex-direction: column; align-items: center; gap: 0px;
+    }
+    .chat-circle {
+      width: 56px; height: 56px; background: linear-gradient(145deg, #ff9f4a, #ff4d2e);
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; box-shadow: 0 0 15px rgba(255,80,40,0.8), 0 8px 20px rgba(0,0,0,0.2);
+      transition: transform 0.2s ease, box-shadow 0.3s ease;
+      animation: float-glow 2.2s infinite ease-in-out; position: relative;
+    }
+    .chat-circle img {
+      width: 46px; height: 46px; border-radius: 50%; object-fit: cover;
+      border: 2px solid rgba(255,255,255,0.6);
+    }
+    .chat-circle::after {
+      content: ''; position: absolute; top: -4px; left: -4px; right: -4px; bottom: -4px;
+      border-radius: 50%; background: radial-gradient(circle, rgba(255,100,40,0.6), transparent 70%);
+      z-index: -1; animation: pulse-ring 1.8s infinite; pointer-events: none;
+    }
+    @keyframes float-glow {
+      0% { transform: translateY(0px); box-shadow: 0 0 12px rgba(255,80,40,0.7), 0 8px 20px rgba(0,0,0,0.2); }
+      50% { transform: translateY(-6px); box-shadow: 0 0 28px rgba(255,100,50,1), 0 15px 25px rgba(0,0,0,0.25); }
+      100% { transform: translateY(0px); box-shadow: 0 0 12px rgba(255,80,40,0.7), 0 8px 20px rgba(0,0,0,0.2); }
+    }
+    @keyframes pulse-ring {
+      0% { opacity: 0.6; transform: scale(1); }
+      70% { opacity: 0; transform: scale(1.3); }
+      100% { opacity: 0; transform: scale(1.3); }
+    }
+    .chat-label {
+      background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); color: #ffaa66;
+      font-size: 0.65rem; font-weight: 600; padding: 3px 8px; border-radius: 30px;
+      margin-top: 6px; cursor: pointer; transition: all 0.2s; text-align: center;
+      border: 1px solid #ff8a4c; letter-spacing: 0.3px;
+    }
+    .chat-label:hover { background: rgba(255,138,76,0.3); color: white; border-color: #ffb347; }
+    .chat-box {
+      position: absolute; bottom: 80px; right: 0; width: 90vw; max-width: 450px; height: 500px;
+      background: rgba(255,255,255,0.75); backdrop-filter: blur(16px); border-radius: 28px;
+      border: 1px solid rgba(255,255,255,0.3); box-shadow: 0 20px 35px -10px rgba(0,0,0,0.2);
+      display: none; flex-direction: column; overflow: hidden;
+    }
+    body.dark .chat-box { background: rgba(30,30,42,0.85); backdrop-filter: blur(16px); }
+    .chat-box.show { display: flex; }
+    .chat-header {
+      padding: 1rem 1.2rem; background: rgba(0,0,0,0.05); backdrop-filter: blur(4px);
+      border-bottom: 1px solid var(--border); display: flex; justify-content: space-between;
+      align-items: center;
+    }
+    .chat-header h4 { font-weight: 700; color: var(--accent-1); font-size: 1rem; }
+    .close-chat { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-secondary); }
+    .chat-messages {
+      flex: 1; padding: 1rem; overflow-y: auto; display: flex; flex-direction: column; gap: 10px;
+    }
+    .chat-message {
+      max-width: 85%; padding: 8px 14px; border-radius: 20px; font-size: 0.85rem;
+      background: var(--surface); color: var(--text-primary); align-self: flex-start;
+      border: 1px solid var(--border);
+    }
+    .chat-message.bot { background: var(--gradient); color: white; border: none; }
+    .chat-input-area {
+      display: flex; padding: 10px; gap: 8px; background: rgba(0,0,0,0.03);
+      border-top: 1px solid var(--border);
+    }
+    .chat-input-area textarea {
+      flex: 1; background: var(--surface); border: none; border-radius: 40px;
+      padding: 8px 14px; resize: none; font-size: 0.8rem; color: var(--text-primary);
+    }
+    .chat-input-area button {
+      background: var(--gradient); border: none; border-radius: 40px; padding: 0 18px;
+      color: white; font-weight: bold; cursor: pointer;
+    }
+    /* Responsive */
+    @media (max-width: 768px) {
+      .dual-section { flex-direction: column; }
+      .search-bar button { padding: 0.6rem 1rem; }
+      .filter-bar { gap: 0.5rem; padding: 0.3rem 0.6rem; }
+      .filter-group select { font-size: 0.7rem; padding: 0.2rem 1.2rem 0.2rem 0.6rem; }
+      .app-link-mobile, .theme-toggle, .sign-in-btn { display: none !important; }
+    }
+    @media (min-width: 768px) and (max-width: 1023px) {
+      .product-grid { grid-template-columns: repeat(2, 1fr); }
+      .testimonial-grid { grid-template-columns: repeat(2, 1fr); }
+      .features-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (min-width: 1024px) {
+      .product-grid { grid-template-columns: repeat(4, 1fr); gap: 2rem; }
+      .testimonial-grid { grid-template-columns: repeat(3, 1fr); }
+      .features-grid { grid-template-columns: repeat(3, 1fr); }
+      .app-buttons { flex-direction: row; justify-content: center; }
+      .container { padding: 0 2rem; }
+      nav { padding: 0.8rem 2rem; }
+      .logo-area img { height: 52px; }
+      .logo-text h2 { font-size: 1.5rem; }
+      .nav-links { display: flex; }
+      .app-link-mobile { display: none; }
+      .hamburger { display: none; }
+      .hero h1 { font-size: 3rem; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="logo-area">
+      <img src="photo_2026-02-17_19-01-20.jpg" alt="Phoenix">
+      <div class="logo-text"><h2>Phoenix</h2><span>donate & trade</span></div>
+    </div>
+    <a href="#app-download" class="app-link-mobile">App</a>
+    <div class="nav-links">
+      <a href="#market">Market</a>
+      <a href="#donate">Donate</a>
+      <a href="#sell">Sell</a>
+      <a href="#categories">Categories</a>
+      <a href="about.html">About</a>
+      <a href="#app-download" class="app-link">App</a>
+    </div>
+    <div class="nav-right">
+      <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
+      <a href="sign.html" class="sign-in-btn">Sign In</a>
+      <span class="hamburger" id="hamburger">☰</span>
+    </div>
+  </nav>
+
+  <div class="sidebar" id="sidebar">
+    <div class="close-btn" id="closeSidebar">✕</div>
+    <ul>
+      <li><a href="#market">Market</a></li>
+      <li><a href="#donate">Donate</a></li>
+      <li><a href="#sell">Sell</a></li>
+      <li><a href="#categories">Categories</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="#app-download">App</a></li>
+      <li class="sidebar-mobile-item"><button class="sidebar-theme-btn" id="sidebarThemeToggle"><i class="fas fa-moon"></i> Dark Mode</button></li>
+      <li><a href="sign.html" id="sidebarSignIn"><i class="fas fa-sign-in-alt"></i> Sign In</a></li>
+    </ul>
+  </div>
+  <div class="overlay" id="overlay"></div>
+
+  <main class="container">
+    <section class="hero">
+      <h1><span class="line1">Give your items a new life</span><span class="line2">donate or trade with purpose</span></h1>
+      <p>Join a community that gives items new life. Every exchange matters.</p>
+      <div class="hero-buttons">
+        <a href="#market" class="btn-glow">Start Trading</a>
+        <a href="about.html" class="btn-outline-glow">Learn More</a>
+      </div>
+    </section>
+
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Search for products...">
+      <button id="searchBtn">Search</button>
+    </div>
+
+    <div class="filter-bar" id="categories">
+      <div class="filter-group"><label><i class="fas fa-tag"></i> Category</label><select id="categorySelect"><option value="all">All</option><option value="electronics">Electronics</option><option value="fashion">Fashion</option><option value="furniture">Furniture</option><option value="sports">Sports</option><option value="books">Books</option><option value="toys">Toys</option><option value="other">Other</option></select></div>
+      <div class="filter-group"><label><i class="fas fa-check-circle"></i> Condition</label><select id="conditionSelect"><option value="all">All</option><option value="new">New</option><option value="like-new">Like New</option><option value="good">Good</option><option value="fair">Fair</option></select></div>
+      <div class="filter-group"><label><i class="fas fa-dollar-sign"></i> Price</label><select id="priceSelect"><option value="all">All</option><option value="under50">Under $50</option><option value="50-200">$50 - $200</option><option value="200-500">$200 - $500</option><option value="500plus">$500+</option></select></div>
+    </div>
+
+    <section id="market">
+      <h2 class="section-title">Featured <span>products</span></h2>
+      <div class="product-grid" id="productGrid"></div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <div class="dual-section" id="donate">
+      <div class="dual-card"><i class="fas fa-hand-holding-heart"></i><h3>Donate items</h3><p>Give belongings a new home. Zero cost, maximum impact.</p><button class="btn-glow" onclick="showLoginModal()">Start Donating</button></div>
+      <div class="dual-card" id="sell"><i class="fas fa-tags"></i><h3>Items for sale</h3><p>Quality pre-loved items at fair prices.</p><button class="btn-outline-glow" onclick="showLoginModal()">Start Selling</button></div>
+    </div>
+
+    <h2 class="section-title">What Our <span>Community Says</span></h2>
+    <div class="testimonial-grid" id="testimonials"></div>
+
+    <h2 class="section-title">Why Choose <span>Phoenix?</span></h2>
+    <div class="features-grid" id="features"></div>
+
+    <div class="app-download" id="app-download">
+      <h2>Take Phoenix with you anywhere</h2>
+      <p>Fast & Easy · Real-time Chat · Location-based</p>
+      <div class="app-buttons"><a href="#" class="store-btn" target="_blank"><i class="fab fa-apple"></i> App Store</a><a href="#" class="store-btn" target="_blank"><i class="fab fa-google-play"></i> Google Play</a></div>
+    </div>
+  </main>
+
+  <div class="simple-footer">
+    Copyright © 2026 Phoenix - <a href="about.html">about</a>
+  </div>
+
+  <div class="modal" id="loginModal">
+    <div class="modal-content"><i class="fas fa-lock"></i><p>You need to sign in first to continue.</p><div class="modal-buttons"><a href="sign.html" class="modal-btn">Sign In</a><button class="modal-btn outline" id="cancelModalBtn">Cancel</button></div></div>
+  </div>
+
+  <div class="chatbot">
+    <div class="chat-circle" id="chatIcon"><img src="photo_2026-02-17_19-01-20.jpg" alt="Phoenix AI"></div>
+    <span class="chat-label" id="chatLabel">Ask AI</span>
+    <div class="chat-box" id="chatBox">
+      <div class="chat-header"><h4><i class="fas fa-feather-alt"></i> Phoenix Personal AI Assistant</h4><button class="close-chat" id="closeChatBtn">✕</button></div>
+      <div class="chat-messages" id="chatMessages"><div class="chat-message bot">👋 Hi! I'm Phoenix AI. How can I help you today?</div></div>
+      <div class="chat-input-area"><textarea id="chatInput" placeholder="Type your message..." rows="1"></textarea><button id="sendChat">Send</button></div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      'use strict';
+
+      // ========== بيانات المنتجات ==========
+      const products = [
+        { id: 1, title: 'MacBook Pro 16" M3 Max', user: 'Apple', price: 2499, type: 'sale', category: 'electronics', condition: 'new', image: 'macbook.jpeg' },
+        { id: 2, title: 'Sony WH-1000XM5', user: 'Sony', price: 299, type: 'sale', category: 'electronics', condition: 'like-new', image: 'Sony.jpeg' },
+        { id: 3, title: 'Canon EOS R6 II', user: 'Canon', price: 2199, type: 'sale', category: 'electronics', condition: 'good', image: 'Camera.png' },
+        { id: 4, title: 'Winter Coat', user: 'Free', price: 0, type: 'free', category: 'fashion', condition: 'like-new', image: 'Coat.jpeg' },
+        { id: 5, title: 'iPad Pro 12.9"', user: 'Apple', price: 1099, type: 'sale', category: 'electronics', condition: 'new', image: 'ipad.png' },
+        { id: 6, title: 'Gaming Chair', user: 'Secretlab', price: 399, type: 'sale', category: 'furniture', condition: 'like-new', image: 'Chair.png' },
+        { id: 7, title: 'Yoga Mat', user: 'Lululemon', price: 0, type: 'free', category: 'sports', condition: 'good', image: 'Yoga.png' },
+        { id: 8, title: 'Smart Watch', user: 'Garmin', price: 249, type: 'sale', category: 'electronics', condition: 'new', image: 'Smart Watch.png' }
+      ];
+
+      const testimonials = [
+        { name: 'Sara Ahmed', city: 'Cairo', stars: 5, date: 'March 2025', text: 'I donated my old laptop and it helped a student in need. Amazing feeling!', avatar: 'https://i.pravatar.cc/60?img=1' },
+        { name: 'Mohamed Ali', city: 'Alexandria', stars: 5, date: 'February 2025', text: 'Sold my camera quickly and easily. The platform is very user-friendly.', avatar: 'https://i.pravatar.cc/60?img=2' },
+        { name: 'Nora Hassan', city: 'Giza', stars: 5, date: 'January 2025', text: 'Received a free winter coat for my son. Such a generous community!', avatar: 'https://i.pravatar.cc/60?img=3' }
+      ];
+
+      const features = [
+        { icon: 'fa-recycle', title: 'Sustainable', desc: 'Reduce waste' }, { icon: 'fa-shield-alt', title: 'Safe', desc: 'Verified profiles' },
+        { icon: 'fa-map-marker-alt', title: 'Nearby', desc: 'Local pickup' }, { icon: 'fa-comment-dots', title: 'Chat', desc: 'Direct messaging' },
+        { icon: 'fa-handshake', title: 'Trust', desc: 'Badges & ratings' }, { icon: 'fa-hand-holding-heart', title: 'Donation impact', desc: 'Track goodwill' }
+      ];
+
+      // ========== Dark Mode (مستقر عبر الصفحات) ==========
+      const themeToggle = document.getElementById('themeToggle');
+      const sidebarTheme = document.getElementById('sidebarThemeToggle');
+
+      // دالة تطبيق الثيم بناءً على القيمة المحفوظة
+      function applyTheme(isDark) {
+        document.body.classList.toggle('dark', isDark);
+        const icon = themeToggle.querySelector('i');
+        icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+        if (sidebarTheme) {
+          sidebarTheme.innerHTML = isDark ? '<i class="fas fa-sun"></i> Dark Mode' : '<i class="fas fa-moon"></i> Dark Mode';
+        }
+        localStorage.setItem('phoenix-theme', isDark ? 'dark' : 'light');
+      }
+
+      // تهيئة الثيم من localStorage
+      const savedTheme = localStorage.getItem('phoenix-theme') === 'dark';
+      applyTheme(savedTheme);
+
+      // تبديل الثيم
+      function toggleTheme() {
+        const isDark = !document.body.classList.contains('dark');
+        applyTheme(isDark);
+      }
+      themeToggle.addEventListener('click', toggleTheme);
+      if (sidebarTheme) sidebarTheme.addEventListener('click', toggleTheme);
+
+      // ========== التحقق من تسجيل الدخول ==========
+      function isLoggedIn() {
+        return !!localStorage.getItem('currentUser');
+      }
+
+      // ========== Modal ==========
+      const modal = document.getElementById('loginModal');
+      const cancelModalBtn = document.getElementById('cancelModalBtn');
+      function showLoginModal() { modal.classList.add('active'); }
+      function hideLoginModal() { modal.classList.remove('active'); }
+      window.showLoginModal = showLoginModal;
+      cancelModalBtn.addEventListener('click', hideLoginModal);
+      modal.addEventListener('click', (e) => { if (e.target === modal) hideLoginModal(); });
+
+      // ========== Sidebar ==========
+      const hamburger = document.getElementById('hamburger'), sidebar = document.getElementById('sidebar'), overlay = document.getElementById('overlay'), closeBtn = document.getElementById('closeSidebar');
+      function openSidebar() { sidebar.classList.add('open'); overlay.classList.add('active'); }
+      function closeSidebarFunc() { sidebar.classList.remove('open'); overlay.classList.remove('active'); }
+      hamburger.addEventListener('click', openSidebar);
+      closeBtn.addEventListener('click', closeSidebarFunc);
+      overlay.addEventListener('click', closeSidebarFunc);
+      document.querySelectorAll('.sidebar a').forEach(anchor => anchor.addEventListener('click', closeSidebarFunc));
+
+      // ========== عرض المنتجات (مع منع الدخول لغير المسجلين) ==========
+      const productGrid = document.getElementById('productGrid');
+      const categorySelect = document.getElementById('categorySelect');
+      const conditionSelect = document.getElementById('conditionSelect');
+      const priceSelect = document.getElementById('priceSelect');
+      const searchInput = document.getElementById('searchInput');
+      let filters = { category: 'all', condition: 'all', price: 'all', search: '' };
+
+      function filterProducts() {
+        return products.filter(p => {
+          if (filters.category !== 'all' && p.category !== filters.category) return false;
+          if (filters.condition !== 'all' && p.condition !== filters.condition) return false;
+          if (filters.price !== 'all') {
+            if (filters.price === 'under50' && p.price >= 50) return false;
+            if (filters.price === '50-200' && (p.price < 50 || p.price > 200)) return false;
+            if (filters.price === '200-500' && (p.price < 200 || p.price > 500)) return false;
+            if (filters.price === '500plus' && p.price <= 500) return false;
+          }
+          if (filters.search && !p.title.toLowerCase().includes(filters.search.toLowerCase())) return false;
+          return true;
+        });
+      }
+
+      function renderProducts() {
+        const filtered = filterProducts();
+        if (filtered.length === 0) {
+          productGrid.innerHTML = '<div class="no-results">No matched items</div>';
+          return;
+        }
+        productGrid.innerHTML = filtered.map(p => `
+          <div class="product-card" data-id="${p.id}">
+            <div class="product-img"><img src="${p.image}" alt="${p.title}" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-image\\' style=\\'font-size:3rem; color:#b95b1d;\\'></i>'"></div>
+            <div class="product-badges"><span class="badge">${p.category}</span><span class="badge">${p.condition}</span></div>
+            <div class="product-title">${p.title}</div>
+            <div class="product-user">${p.user}</div>
+            <div class="product-footer">
+              <span class="product-value">${p.price === 0 ? 'Free' : '$' + p.price}</span>
+              <button class="trade-btn">${p.type === 'sale' ? 'Buy Now' : 'Get Item'}</button>
+            </div>
+          </div>
+        `).join('');
+
+        // معالجة النقر على الكارد أو الزر: إذا لم يسجل الدخول، أظهر المودال
+        document.querySelectorAll('.product-card').forEach(card => {
+          card.addEventListener('click', function(e) {
+            if (e.target.classList.contains('trade-btn')) return;
+            if (!isLoggedIn()) {
+              showLoginModal();
+            } else {
+              window.location.href = `product.html?id=${this.dataset.id}`;
+            }
+          });
+        });
+        document.querySelectorAll('.trade-btn').forEach(btn => {
+          btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const card = this.closest('.product-card');
+            if (!isLoggedIn()) {
+              showLoginModal();
+            } else {
+              window.location.href = `product.html?id=${card.dataset.id}`;
+            }
+          });
+        });
+      }
+
+      function updateFilters() { filters.search = searchInput.value.trim(); renderProducts(); }
+      categorySelect.addEventListener('change', () => { filters.category = categorySelect.value; renderProducts(); });
+      conditionSelect.addEventListener('change', () => { filters.condition = conditionSelect.value; renderProducts(); });
+      priceSelect.addEventListener('change', () => { filters.price = priceSelect.value; renderProducts(); });
+      document.getElementById('searchBtn').addEventListener('click', updateFilters);
+      searchInput.addEventListener('input', updateFilters);
+      renderProducts();
+
+      // ========== محتوى ثابت ==========
+      document.getElementById('testimonials').innerHTML = testimonials.map(t => `<div class="testimonial"><div class="testimonial-header"><img src="${t.avatar}" class="testimonial-avatar"><div><h4>${t.name}</h4><div class="city">${t.city}</div></div></div><div class="testimonial-stars">${'★'.repeat(t.stars)}</div><div class="testimonial-text">"${t.text}"</div></div>`).join('');
+      document.getElementById('features').innerHTML = features.map(f => `<div class="feature-item"><div class="feature-icon"><i class="fas ${f.icon}"></i></div><h3>${f.title}</h3><p>${f.desc}</p></div>`).join('');
+
+      // ========== Chatbot ==========
+      const chatIcon = document.getElementById('chatIcon');
+      const chatLabel = document.getElementById('chatLabel');
+      const chatBox = document.getElementById('chatBox');
+      const chatMessages = document.getElementById('chatMessages');
+      const chatInput = document.getElementById('chatInput');
+      const sendBtn = document.getElementById('sendChat');
+      const closeChatBtn = document.getElementById('closeChatBtn');
+
+      function toggleChat() { chatBox.classList.toggle('show'); }
+      chatIcon.addEventListener('click', toggleChat);
+      chatLabel.addEventListener('click', toggleChat);
+      closeChatBtn.addEventListener('click', () => chatBox.classList.remove('show'));
+
+      function addMessage(txt, isUser = false) {
+        const div = document.createElement('div');
+        div.className = 'chat-message' + (isUser ? '' : ' bot');
+        div.textContent = txt;
+        chatMessages.appendChild(div);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+      sendBtn.addEventListener('click', () => {
+        const msg = chatInput.value.trim();
+        if (!msg) return;
+        addMessage(msg, true);
+        chatInput.value = '';
+        setTimeout(() => addMessage('Thanks! Phoenix AI will assist you shortly. 🔥'), 600);
+      });
+      chatInput.addEventListener('keypress', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendBtn.click(); } });
+      document.addEventListener('click', e => { if (!chatBox.contains(e.target) && !chatIcon.contains(e.target) && !chatLabel.contains(e.target)) chatBox.classList.remove('show'); });
+
+      // Smooth scroll
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+          e.preventDefault();
+          const targetId = this.getAttribute('href');
+          if (targetId && targetId !== '#') {
+            const targetEl = document.querySelector(targetId);
+            if (targetEl) { window.scrollTo({ top: targetEl.offsetTop - 70, behavior: 'smooth' }); }
+          }
+          closeSidebarFunc();
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

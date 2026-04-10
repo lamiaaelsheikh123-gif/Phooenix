@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Phoenix · Create Account</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        :root {
+            --bg: #f9f9f9;                /* خلفية موحدة هادئة */
+            --surface: #ffffff;
+            --text-primary: #1e1e2f;
+            --text-secondary: #4a4a5e;
+            --accent-1: #ff8a4c;
+            --accent-2: #ff6b2b;
+            --gradient: linear-gradient(135deg, #ff8a4c, #ff4d4d);
+            --border-light: #ddd;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            --glow: rgba(255, 110, 64, 0.4);
+            --input-bg: #ffffff;
+            --card-bg: #ffffff;
+            --navbar-bg: rgba(255, 255, 255, 0.9);
+            --error: #e53e3e;
+            --error-bg: #fee2e2;
+            --success: #2ecc71;
+        }
+
+        body.dark {
+            --bg: #12121a;
+            --surface: #1e1e2a;
+            --text-primary: #f0f0fa;
+            --text-secondary: #b0b0c0;
+            --accent-1: #ff9f6e;
+            --accent-2: #ff7b3f;
+            --gradient: linear-gradient(135deg, #ff9f6e, #ff5e5e);
+            --border-light: #3a3a4a;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            --glow: rgba(255, 140, 80, 0.5);
+            --input-bg: #252533;
+            --card-bg: #1e1e2a;
+            --navbar-bg: rgba(30, 30, 42, 0.9);
+            --error: #fc8181;
+            --error-bg: #3a2a2a;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-primary);
+            line-height: 1.5;
+            transition: background-color 0.3s, color 0.2s;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== NAVBAR ===== */
+        .nav-mini {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: var(--navbar-bg);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-light);
+            position: relative;
+            z-index: 10;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo-area img {
+            height: 52px;
+            width: auto;
+            border-radius: 12px;
+        }
+
+        .logo-text h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-text span {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .theme-toggle:hover {
+            transform: rotate(15deg);
+        }
+
+        /* ===== SIGN UP CARD ===== */
+        .signup-container {
+            display: flex;
+            flex: 1;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .signup-card {
+            max-width: 580px;
+            width: 100%;
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-light);
+            padding: 2rem 2rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .signup-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1);
+        }
+
+        .form-side h3 {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        .form-side .subhead {
+            color: var(--text-secondary);
+            margin-bottom: 1.8rem;
+            font-size: 1rem;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.2rem;
+            flex-wrap: wrap;
+        }
+
+        .form-row .input-group {
+            flex: 1;
+            min-width: 140px;
+        }
+
+        .input-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 0.85rem 1.2rem;
+            background: var(--input-bg);
+            border: 1px solid var(--border-light);
+            border-radius: 15px;
+            font-size: 1rem;
+            color: var(--text-primary);
+            transition: all 0.2s;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--accent-1);
+            box-shadow: 0 0 0 3px var(--glow);
+        }
+
+        .gender-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .gender-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .gender-cards {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .gender-card {
+            flex: 1;
+            min-width: 120px;
+            background: var(--input-bg);
+            border: 1px solid var(--border-light);
+            border-radius: 15px;
+            padding: 0.8rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .gender-card i {
+            margin-right: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .gender-card.active {
+            background: var(--gradient);
+            color: white;
+            border-color: var(--accent-1);
+            box-shadow: 0 0 12px var(--glow);
+        }
+
+        .gender-card:hover:not(.active) {
+            border-color: var(--accent-1);
+            transform: translateY(-2px);
+        }
+
+        .password-requirements {
+            background: var(--input-bg);
+            border-radius: 15px;
+            padding: 0.8rem 1rem;
+            margin-top: 0.5rem;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-light);
+        }
+
+        .password-requirements p {
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .password-requirements ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem 1rem;
+            margin-top: 0.3rem;
+        }
+
+        .password-requirements li {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.7rem;
+        }
+
+        .password-requirements li i {
+            font-size: 0.6rem;
+            color: var(--accent-1);
+        }
+
+        .req-met {
+            color: var(--success);
+        }
+
+        .req-met i {
+            color: var(--success) !important;
+        }
+
+        .terms-group {
+            margin: 1.5rem 0 1rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+
+        .terms-group input {
+            margin-top: 0.2rem;
+            width: 1.1rem;
+            height: 1.1rem;
+            accent-color: var(--accent-1);
+            cursor: pointer;
+        }
+
+        .terms-group label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        .terms-group a {
+            color: var(--accent-1);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .terms-group a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            background: var(--error-bg);
+            color: var(--error);
+            font-size: 0.85rem;
+            padding: 0.7rem 1rem;
+            border-radius: 15px;
+            margin: 0.5rem 0 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: opacity 0.3s, transform 0.3s;
+            border: 1px solid var(--error);
+        }
+
+        .error-message.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .btn-signup {
+            width: 100%;
+            background: var(--gradient);
+            color: white;
+            border: none;
+            padding: 0.9rem;
+            border-radius: 15px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.25s;
+            box-shadow: 0 4px 14px var(--glow);
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-signup:hover:not(:disabled) {
+            transform: scale(1.02);
+            box-shadow: 0 8px 25px var(--glow);
+        }
+
+        .btn-signup:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .spinner {
+            width: 1.2rem;
+            height: 1.2rem;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: inline-block;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .or-divider {
+            text-align: center;
+            position: relative;
+            margin: 1.5rem 0;
+        }
+
+        .or-divider span {
+            background: var(--card-bg);
+            padding: 0 1rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .or-divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--border-light);
+            z-index: 1;
+        }
+
+        .google-btn {
+            width: 100%;
+            background: transparent;
+            border: 1px solid var(--border-light);
+            color: var(--text-primary);
+            padding: 0.9rem;
+            border-radius: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 1rem;
+        }
+
+        .google-btn:hover {
+            background: var(--surface);
+            border-color: var(--accent-1);
+            transform: translateY(-2px);
+        }
+
+        .google-btn img {
+            width: 1.2rem;
+            height: 1.2rem;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 1rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .login-link a {
+            color: var(--accent-1);
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0.2s, opacity 0.2s;
+        }
+
+        .modal-overlay.active {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .success-modal {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 32px;
+            border: 1px solid var(--border-light);
+            padding: 2rem;
+            text-align: center;
+            max-width: 380px;
+            width: 90%;
+            box-shadow: 0 30px 40px rgba(0,0,0,0.2);
+            animation: modalPop 0.3s ease-out;
+        }
+
+        @keyframes modalPop {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .checkmark-circle {
+            width: 70px;
+            height: 70px;
+            background: var(--success);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.2rem;
+            animation: checkPop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes checkPop {
+            0% { transform: scale(0); opacity: 0; }
+            80% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .checkmark-circle i {
+            font-size: 2.5rem;
+            color: white;
+        }
+
+        .success-modal h4 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .success-modal p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .dashboard-btn {
+            background: var(--gradient);
+            border: none;
+            padding: 0.8rem 1.8rem;
+            border-radius: 15px;
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .dashboard-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px var(--glow);
+        }
+
+        @media (max-width: 768px) {
+            .nav-mini { padding: 0.8rem 1rem; }
+            .logo-area img { height: 44px; }
+            .logo-text h2 { font-size: 1.3rem; }
+            .logo-text span { display: none; }
+            .signup-container { padding: 1rem; }
+            .signup-card { padding: 1.5rem 1rem; }
+            .form-row { flex-direction: column; gap: 0; }
+            .gender-cards { flex-direction: column; }
+            .gender-card { width: 100%; }
+            .input-field { padding: 0.75rem 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== NAVBAR ===== -->
+    <div class="nav-mini">
+        <div class="logo-area">
+            <img src="photo_2026-02-17_19-01-20.jpg" alt="Phoenix">
+            <div class="logo-text">
+                <h2>Phoenix</h2>
+                <span>donate & trade</span>
+            </div>
+        </div>
+        <div class="nav-right">
+            <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
+        </div>
+    </div>
+
+    <!-- ===== SIGN UP CARD ===== -->
+    <div class="signup-container">
+        <div class="signup-card">
+            <div class="form-side">
+                <h3>Create Account</h3>
+                <div class="subhead">Fill in your details to get started.</div>
+
+                <form id="signupForm">
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label>First Name</label>
+                            <input type="text" id="firstName" name="first_name" class="input-field" placeholder="John" autofocus required>
+                        </div>
+                        <div class="input-group">
+                            <label>Last Name</label>
+                            <input type="text" id="lastName" name="last_name" class="input-field" placeholder="Doe" required>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Email Address</label>
+                        <input type="email" id="email" name="email" class="input-field" placeholder="hello@phoenix.exchange" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label>Phone Number</label>
+                            <input type="tel" id="phone" name="phone" class="input-field" placeholder="+20 123 456 789" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Age</label>
+                            <input type="number" id="age" name="age" class="input-field" placeholder="18+" min="18" max="100" required>
+                        </div>
+                    </div>
+
+                    <div class="gender-group">
+                        <label>Gender</label>
+                        <div class="gender-cards" id="genderCards">
+                            <div class="gender-card" data-gender="male">
+                                <i class="fas fa-mars"></i> Male
+                            </div>
+                            <div class="gender-card" data-gender="female">
+                                <i class="fas fa-venus"></i> Female
+                            </div>
+                        </div>
+                        <input type="hidden" id="genderInput" name="gender" value="">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Password</label>
+                        <input type="password" id="password" name="password" class="input-field" placeholder="Create a strong password" required>
+                        <div class="password-requirements">
+                            <p>Your password must contain:</p>
+                            <ul id="passwordReqsList">
+                                <li id="req-length"><i class="fas fa-circle"></i> At least 8 characters</li>
+                                <li id="req-upper"><i class="fas fa-circle"></i> One uppercase letter</li>
+                                <li id="req-lower"><i class="fas fa-circle"></i> One lowercase letter</li>
+                                <li id="req-number"><i class="fas fa-circle"></i> One number</li>
+                                <li id="req-special"><i class="fas fa-circle"></i> One special character (!@#$%^&*)</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Confirm Password</label>
+                        <input type="password" id="confirmPassword" class="input-field" placeholder="Confirm your password" required>
+                    </div>
+
+                    <div class="terms-group">
+                        <input type="checkbox" id="termsCheckbox">
+                        <label for="termsCheckbox">
+                            I agree to the <a href="#" id="termsLink">Terms and Conditions</a> and <a href="#" id="privacyLink">Privacy Policy</a>.
+                        </label>
+                    </div>
+
+                    <div id="errorMessage" class="error-message">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span></span>
+                    </div>
+
+                    <button type="submit" class="btn-signup" id="signupButton">
+                        <span>Sign Up</span>
+                    </button>
+                </form>
+
+                <div class="or-divider"><span>OR</span></div>
+                <button class="google-btn" id="googleBtn">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo">
+                    Continue with Google
+                </button>
+
+                <div class="login-link">
+                    Already have an account? <a href="sign.html">Sign In</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== SUCCESS MODAL ===== -->
+    <div class="modal-overlay" id="successModal">
+        <div class="success-modal">
+            <div class="checkmark-circle">
+                <i class="fas fa-check"></i>
+            </div>
+            <h4>Welcome to the Phoenix Family!</h4>
+            <p>Your account has been created successfully.</p>
+            <button class="dashboard-btn" id="goToDashboardBtn">Go to Dashboard</button>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            // ========== 1. Dark Mode (localStorage) ==========
+            const themeToggle = document.getElementById('themeToggle');
+            const themeIcon = themeToggle.querySelector('i');
+
+            function applyTheme(isDark) {
+                document.body.classList.toggle('dark', isDark);
+                themeIcon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+                localStorage.setItem('phoenix-theme', isDark ? 'dark' : 'light');
+            }
+
+            const savedTheme = localStorage.getItem('phoenix-theme') === 'dark';
+            applyTheme(savedTheme);
+
+            themeToggle.addEventListener('click', () => {
+                const isDark = !document.body.classList.contains('dark');
+                applyTheme(isDark);
+            });
+
+            // ========== 2. Gender Cards ==========
+            const genderCards = document.querySelectorAll('.gender-card');
+            const genderInput = document.getElementById('genderInput');
+
+            function setActiveGender(value) {
+                genderCards.forEach(card => {
+                    const cardGender = card.getAttribute('data-gender');
+                    if (cardGender === value) card.classList.add('active');
+                    else card.classList.remove('active');
+                });
+                genderInput.value = value;
+            }
+
+            genderCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    setActiveGender(card.getAttribute('data-gender'));
+                });
+            });
+
+            // ========== 3. Password Validation ==========
+            const passwordField = document.getElementById('password');
+            const reqLength = document.getElementById('req-length');
+            const reqUpper = document.getElementById('req-upper');
+            const reqLower = document.getElementById('req-lower');
+            const reqNumber = document.getElementById('req-number');
+            const reqSpecial = document.getElementById('req-special');
+
+            function validatePassword(pwd) {
+                const hasLength = pwd.length >= 8;
+                const hasUpper = /[A-Z]/.test(pwd);
+                const hasLower = /[a-z]/.test(pwd);
+                const hasNumber = /[0-9]/.test(pwd);
+                const hasSpecial = /[!@#$%^&*]/.test(pwd);
+
+                updateRequirement(reqLength, hasLength);
+                updateRequirement(reqUpper, hasUpper);
+                updateRequirement(reqLower, hasLower);
+                updateRequirement(reqNumber, hasNumber);
+                updateRequirement(reqSpecial, hasSpecial);
+
+                return hasLength && hasUpper && hasLower && hasNumber && hasSpecial;
+            }
+
+            function updateRequirement(element, isValid) {
+                if (isValid) {
+                    element.classList.add('req-met');
+                    element.querySelector('i').className = 'fas fa-check-circle';
+                } else {
+                    element.classList.remove('req-met');
+                    element.querySelector('i').className = 'fas fa-circle';
+                }
+            }
+
+            passwordField.addEventListener('input', (e) => {
+                validatePassword(e.target.value);
+            });
+
+            // ========== 4. Error Handling ==========
+            const errorDiv = document.getElementById('errorMessage');
+            const errorSpan = errorDiv.querySelector('span');
+
+            function showError(message) {
+                errorSpan.textContent = message;
+                errorDiv.classList.add('show');
+                setTimeout(() => errorDiv.classList.remove('show'), 5000);
+            }
+
+            // ========== 5. Loading Spinner ==========
+            const signupBtn = document.getElementById('signupButton');
+
+            function setLoading(isLoading) {
+                if (isLoading) {
+                    signupBtn.disabled = true;
+                    signupBtn.innerHTML = '<span class="spinner"></span> Creating account...';
+                } else {
+                    signupBtn.disabled = false;
+                    signupBtn.innerHTML = '<span>Sign Up</span>';
+                }
+            }
+
+            // ========== 6. Sign Up Logic (LocalStorage) ==========
+            async function handleSignUp(userData) {
+                await new Promise(resolve => setTimeout(resolve, 1200));
+
+                const users = JSON.parse(localStorage.getItem('users')) || [];
+                const emailExists = users.some(user => user.email === userData.email);
+
+                if (emailExists) {
+                    return { success: false, error: 'This email is already registered. Please sign in instead.' };
+                }
+
+                const newUser = { ...userData, id: Date.now() };
+                users.push(newUser);
+                localStorage.setItem('users', JSON.stringify(users));
+                localStorage.setItem('currentUser', JSON.stringify(newUser));
+
+                return { success: true };
+            }
+
+            // ========== 7. Form Submission ==========
+            const form = document.getElementById('signupForm');
+            const firstNameInput = document.getElementById('firstName');
+            const lastNameInput = document.getElementById('lastName');
+            const emailInput = document.getElementById('email');
+            const phoneInput = document.getElementById('phone');
+            const ageInput = document.getElementById('age');
+            const confirmInput = document.getElementById('confirmPassword');
+            const termsCheckbox = document.getElementById('termsCheckbox');
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                errorDiv.classList.remove('show');
+
+                const firstName = firstNameInput.value.trim();
+                const lastName = lastNameInput.value.trim();
+                const email = emailInput.value.trim();
+                const phone = phoneInput.value.trim();
+                const age = parseInt(ageInput.value);
+                const gender = genderInput.value;
+                const password = passwordField.value;
+                const confirm = confirmInput.value;
+
+                if (!firstName || !lastName || !email || !phone || !age || !password || !confirm) {
+                    showError('All fields are required.');
+                    return;
+                }
+                if (!gender) {
+                    showError('Please select your gender.');
+                    return;
+                }
+                if (isNaN(age) || age < 18 || age > 100) {
+                    showError('Age must be between 18 and 100.');
+                    return;
+                }
+                const emailRegex = /^[^\s@]+@([^\s@.,]+\.)+[^\s@.,]{2,}$/;
+                if (!emailRegex.test(email)) {
+                    showError('Please enter a valid email address.');
+                    return;
+                }
+                const phoneRegex = /^[\+\d\s\-\(\)]{8,20}$/;
+                if (!phoneRegex.test(phone)) {
+                    showError('Please enter a valid phone number (8-20 digits).');
+                    return;
+                }
+                if (!validatePassword(password)) {
+                    showError('Password does not meet the requirements.');
+                    return;
+                }
+                if (password !== confirm) {
+                    showError('Passwords do not match.');
+                    return;
+                }
+                if (!termsCheckbox.checked) {
+                    showError('You must agree to the Terms and Conditions and Privacy Policy.');
+                    return;
+                }
+
+                const userData = {
+                    first_name: firstName,
+                    last_name: lastName,
+                    email: email,
+                    phone: phone,
+                    age: age,
+                    gender: gender,
+                    password: password
+                };
+
+                setLoading(true);
+                const result = await handleSignUp(userData);
+                setLoading(false);
+
+                if (!result.success) {
+                    showError(result.error);
+                    return;
+                }
+
+                document.getElementById('successModal').classList.add('active');
+            });
+
+            // ========== 8. Modal & Links ==========
+            document.getElementById('goToDashboardBtn').addEventListener('click', () => {
+                window.location.href = 'dashboard.html';
+            });
+
+            document.getElementById('googleBtn').addEventListener('click', () => {
+                alert('Google authentication will be integrated soon.\nUse email/password to sign up.');
+            });
+
+            document.getElementById('termsLink').addEventListener('click', (e) => {
+                e.preventDefault();
+                alert('Terms and Conditions: By using Phoenix, you agree to our community guidelines...');
+            });
+
+            document.getElementById('privacyLink').addEventListener('click', (e) => {
+                e.preventDefault();
+                alert('Privacy Policy: We value your privacy. Your data is safe with us.');
+            });
+
+            window.addEventListener('load', () => {
+                firstNameInput.focus();
+            });
+        })();
+    </script>
+</body>
+</html>

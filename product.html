@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <title>Phoenix · Product Details</title>
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- Google Fonts: Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <style>
+    /* ========== الأساسيات والمتغيرات ========== */
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+    :root {
+      --bg: #f9fafc; --surface: #ffffff; --text-primary: #1e1e2f; --text-secondary: #4a4a5e;
+      --accent-1: #ff8a4c; --accent-2: #ff6b2b; --gradient: linear-gradient(135deg, #ff8a4c, #ff4d4d);
+      --border: #eaeef2; --shadow: 0 20px 30px -10px rgba(0,0,0,0.05); --glow: rgba(255,110,64,0.4);
+      --navbar-bg: rgba(255,255,255,0.8); --divider-color: #eaeef2;
+    }
+    body.dark {
+      --bg: #12121a; --surface: #1e1e2a; --text-primary: #f0f0fa; --text-secondary: #b0b0c0;
+      --accent-1: #ff9f6e; --accent-2: #ff7b3f; --gradient: linear-gradient(135deg, #ff9f6e, #ff5e5e);
+      --border: #333344; --shadow: 0 20px 30px -10px rgba(0,0,0,0.7); --glow: rgba(255,140,80,0.6);
+      --navbar-bg: rgba(30,30,42,0.9); --divider-color: #333344;
+    }
+    body {
+      background: var(--bg); color: var(--text-primary); line-height: 1.5;
+      transition: background 0.3s, color 0.2s; overflow-x: hidden; min-height: 100vh;
+      display: flex; flex-direction: column;
+    }
+    .container { max-width: 1280px; margin: 0 auto; padding: 0 1rem; width: 100%; flex: 1; }
+
+    /* ===== NAVBAR (موحد) ===== */
+    nav {
+      position: sticky; top: 0; backdrop-filter: blur(12px); background: var(--navbar-bg);
+      border-bottom: 1px solid var(--border); z-index: 100; padding: 0.5rem 1rem;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .logo-area { display: flex; align-items: center; gap: 0.3rem; }
+    .logo-area img { height: 40px; width: auto; border-radius: 8px; }
+    .logo-text h2 { font-size: 1.2rem; font-weight: 700; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .logo-text span { font-size: 0.7rem; color: var(--text-secondary); display: block; }
+    .nav-links { display: flex; gap: 1.5rem; }
+    .nav-links a { text-decoration: none; color: var(--text-primary); font-weight: 500; transition: 0.2s; }
+    .nav-links a:hover { color: var(--accent-1); }
+    .nav-right { display: flex; align-items: center; gap: 0.8rem; position: relative; }
+    .nav-icon { font-size: 1.2rem; color: var(--text-primary); cursor: pointer; transition: 0.2s; }
+    .nav-icon:hover { color: var(--accent-1); }
+    .theme-toggle { background: none; border: none; color: var(--text-primary); font-size: 1.2rem; cursor: pointer; }
+    .profile-badge {
+      display: flex; align-items: center; justify-content: center; background: var(--surface);
+      border-radius: 50%; width: 40px; height: 40px; border: 1px solid var(--border);
+      cursor: pointer; text-decoration: none; color: var(--text-primary); font-weight: 600;
+    }
+    .logout-btn {
+      background: transparent; border: 1px solid var(--accent-1); color: var(--accent-1);
+      padding: 0.3rem 0.9rem; border-radius: 40px; font-weight: 600; cursor: pointer;
+    }
+    .logout-btn:hover { background: var(--accent-1); color: white; box-shadow: 0 0 15px var(--glow); }
+    .hamburger { display: none; font-size: 1.5rem; cursor: pointer; color: var(--text-primary); margin-left: 0.5rem; }
+    .sidebar {
+      position: fixed; top: 0; left: -100%; width: 250px; height: 100vh; background: var(--surface);
+      border-right: 1px solid var(--border); padding: 2rem 1rem; transition: left 0.3s; z-index: 200;
+    }
+    .sidebar.open { left: 0; }
+    .sidebar .close-btn { text-align: right; margin-bottom: 2rem; font-size: 1.5rem; cursor: pointer; }
+    .sidebar ul { list-style: none; }
+    .sidebar li { margin-bottom: 1.2rem; }
+    .sidebar a, .sidebar button {
+      text-decoration: none; color: var(--text-primary); font-weight: 500; font-size: 1.1rem;
+      display: flex; align-items: center; gap: 0.8rem; background: none; border: none; width: 100%; cursor: pointer;
+    }
+    .sidebar a:hover, .sidebar button:hover { color: var(--accent-1); }
+    .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 150; display: none; }
+    .overlay.active { display: block; }
+
+    /* القوائم المنسدلة */
+    .notification-wrapper, .message-wrapper { position: relative; display: inline-flex; align-items: center; }
+    .notification-badge, .message-badge { display: none; }
+    .notification-dropdown, .message-dropdown {
+      position: absolute; top: calc(100% + 8px); right: 0; width: 360px; max-width: 90vw;
+      background: var(--surface); border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      border: 1px solid var(--border); z-index: 1001; display: none; flex-direction: column; overflow: hidden;
+    }
+    .notification-dropdown.show, .message-dropdown.show { display: flex; }
+    .dropdown-header { display: flex; justify-content: space-between; padding: 1rem 1.2rem; border-bottom: 1px solid var(--border); }
+    .dropdown-header h3 { font-size: 1.1rem; }
+    .mark-read-btn { background: none; border: none; color: var(--accent-1); font-size: 0.8rem; cursor: pointer; }
+    .notifications-list, .messages-list { max-height: 320px; overflow-y: auto; }
+    .notification-item, .message-item {
+      display: flex; gap: 0.8rem; padding: 1rem 1.2rem; border-bottom: 1px solid var(--border);
+      cursor: pointer; transition: background 0.2s;
+    }
+    .notification-item:hover, .message-item:hover { background: var(--bg); }
+    .notification-icon { font-size: 1.2rem; color: var(--accent-1); }
+    .notification-content, .message-content { flex: 1; }
+    .notification-title, .message-sender { font-weight: 600; font-size: 0.9rem; }
+    .notification-desc, .message-preview { font-size: 0.8rem; color: var(--text-secondary); }
+    .notification-time, .message-time { font-size: 0.7rem; color: var(--text-secondary); margin-top: 0.2rem; }
+    .message-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--accent-1); overflow: hidden; }
+    .message-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .dropdown-footer { padding: 0.8rem; text-align: center; border-top: 1px solid var(--border); }
+    .dropdown-footer a { color: var(--text-secondary); text-decoration: none; font-size: 0.85rem; }
+    .dropdown-footer a:hover { color: var(--accent-1); text-decoration: underline; }
+
+    /* محتوى المنتج */
+    .back-link { display: inline-block; margin: 1rem 0; color: var(--accent-1); text-decoration: none; }
+    .product-container {
+      background: var(--surface); border-radius: 30px; border: 1px solid var(--border);
+      padding: 2rem; display: flex; gap: 2rem; flex-wrap: wrap; margin-bottom: 2rem;
+    }
+    .product-gallery { flex: 1 1 40%; min-width: 280px; }
+    .main-image { width: 100%; border-radius: 20px; overflow: hidden; border: 1px solid var(--border); background: var(--bg); aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; }
+    .main-image img { width: 100%; height: 100%; object-fit: contain; }
+    .product-info { flex: 1 1 50%; display: flex; flex-direction: column; gap: 1rem; }
+    .product-info h1 { font-size: 2rem; font-weight: 700; }
+    .badge { background: var(--bg); border: 1px solid var(--border); border-radius: 40px; padding: 0.3rem 1rem; font-size: 0.9rem; display: inline-block; margin-right: 0.5rem; }
+    .condition-badge { background: var(--accent-1); color: white; border-radius: 40px; padding: 0.3rem 1rem; font-size: 0.9rem; font-weight: 600; }
+    .price-location { display: flex; justify-content: space-between; align-items: baseline; margin: 0.5rem 0; }
+    .price { font-size: 2.5rem; font-weight: 700; color: var(--accent-2); }
+    .description-section { border-top: 1px solid var(--border); padding-top: 1.5rem; }
+    .seller-card { background: var(--bg); border-radius: 24px; padding: 1.5rem; margin-top: 1.5rem; display: flex; gap: 1rem; align-items: center; }
+    .seller-avatar { width: 64px; height: 64px; border-radius: 50%; border: 2px solid var(--accent-1); display: flex; align-items: center; justify-content: center; }
+    .seller-avatar i { font-size: 2.5rem; color: var(--accent-1); }
+
+    /* مجموعة الأزرار */
+    .action-buttons {
+      display: flex; gap: 1rem; flex-wrap: wrap; margin: 1.5rem 0; align-items: center;
+    }
+    .btn-primary {
+      background: var(--gradient); color: white; border: none; padding: 0.8rem 2rem;
+      border-radius: 60px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem;
+      transition: 0.2s; flex: 0 0 auto;
+    }
+    .btn-primary:hover { transform: scale(1.02); box-shadow: 0 6px 18px var(--glow); }
+    .btn-outline {
+      background: transparent; border: 2px solid var(--accent-1); color: var(--accent-1);
+      padding: 0.8rem 2rem; border-radius: 60px; font-weight: 600; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s; flex: 0 0 auto;
+    }
+    .btn-outline:hover { background: rgba(255,138,76,0.1); }
+    .icon-btn {
+      background: transparent; border: 1px solid var(--border); color: var(--text-primary);
+      width: 48px; height: 48px; border-radius: 50%; display: inline-flex;
+      align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer;
+      transition: 0.2s; flex-shrink: 0;
+    }
+    .icon-btn:hover { background: var(--bg); border-color: var(--accent-1); color: var(--accent-1); }
+    .icon-btn.liked { background: #e74c3c; color: white; border-color: #e74c3c; }
+    .icon-btn.liked i { color: white; }
+
+    /* قائمة المشاركة */
+    .share-wrapper { position: relative; display: inline-block; }
+    .share-dropdown {
+      position: absolute; bottom: 60px; right: 0; background: var(--surface);
+      border-radius: 20px; border: 1px solid var(--border); box-shadow: var(--shadow);
+      padding: 0.8rem; min-width: 180px; display: none; flex-direction: column; gap: 0.5rem;
+      z-index: 10;
+    }
+    .share-dropdown.show { display: flex; }
+    .share-option {
+      display: flex; align-items: center; gap: 0.8rem; padding: 0.6rem 1rem;
+      border-radius: 40px; color: var(--text-primary); text-decoration: none;
+      transition: 0.2s; cursor: pointer;
+    }
+    .share-option:hover { background: var(--bg); color: var(--accent-1); }
+    .share-option i { width: 20px; }
+
+    /* Footer */
+    .simple-footer {
+      margin-top: 3rem; padding: 1.5rem 1rem; text-align: center;
+      border-top: 1px solid var(--divider-color); color: var(--text-secondary); font-size: 0.9rem;
+    }
+    .simple-footer a {
+      color: var(--accent-1); text-decoration: none; font-weight: 600;
+      transition: 0.2s; margin: 0 0.2rem;
+    }
+    .simple-footer a:hover { text-decoration: underline; color: var(--accent-2); }
+
+    /* Chatbot */
+    .chatbot { position: fixed; bottom: 20px; right: 20px; z-index: 999; }
+    .chat-circle { width: 56px; height: 56px; background: linear-gradient(145deg, #ff9f4a, #ff4d2e); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; animation: float-glow 2.2s infinite; }
+    .chat-circle img { width: 46px; height: 46px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,255,255,0.6); }
+    @keyframes float-glow { 0% { transform: translateY(0px); } 50% { transform: translateY(-6px); } 100% { transform: translateY(0px); } }
+    .chat-box { position: absolute; bottom: 80px; right: 0; width: 90vw; max-width: 450px; height: 500px; background: rgba(255,255,255,0.75); backdrop-filter: blur(16px); border-radius: 28px; border: 1px solid rgba(255,255,255,0.3); display: none; flex-direction: column; }
+    body.dark .chat-box { background: rgba(30,30,42,0.85); }
+    .chat-box.show { display: flex; }
+    .chat-header { padding: 1rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
+    .chat-messages { flex: 1; padding: 1rem; overflow-y: auto; }
+    .chat-message { max-width: 85%; padding: 8px 14px; border-radius: 20px; background: var(--surface); margin-bottom: 8px; }
+    .chat-message.bot { background: var(--gradient); color: white; }
+    .chat-input-area { display: flex; padding: 10px; gap: 8px; border-top: 1px solid var(--border); }
+    .chat-input-area textarea { flex: 1; background: var(--surface); border: none; border-radius: 40px; padding: 8px 14px; resize: none; }
+    .chat-input-area button { background: var(--gradient); border: none; border-radius: 40px; padding: 0 18px; color: white; cursor: pointer; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .nav-links, .nav-right .theme-toggle, .nav-right .notification-wrapper, .nav-right .message-wrapper, .nav-right .profile-badge, .nav-right .logout-btn { display: none; }
+      .hamburger { display: block; }
+      .product-container { flex-direction: column; padding: 1.2rem; }
+      .action-buttons { justify-content: center; }
+      .btn-primary, .btn-outline { flex: 1 1 100%; justify-content: center; }
+      .icon-btn { width: 48px; }
+    }
+    @media (min-width: 769px) {
+      .hamburger { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ========== NAVBAR (بدون أيقونة الإعدادات) ========== -->
+<nav>
+  <div class="logo-area">
+    <img src="photo_2026-02-17_19-01-20.jpg" alt="Phoenix">
+    <div class="logo-text"><h2>Phoenix</h2><span>donate & trade</span></div>
+  </div>
+  <div class="nav-links">
+    <a href="dashboard.html">Home</a>
+    <a href="market.html">Market</a>
+    <a href="about.html">About</a>
+  </div>
+  <div class="nav-right">
+    <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
+    <div class="notification-wrapper">
+      <i class="fas fa-bell nav-icon" id="notificationBell"></i>
+      <span class="notification-badge">0</span>
+    </div>
+    <div class="message-wrapper">
+      <i class="fas fa-comment-dots nav-icon" id="messageIcon"></i>
+      <span class="message-badge">0</span>
+    </div>
+    <!-- تمت إزالة أيقونة الإعدادات من هنا -->
+    <a href="profile.html" class="profile-badge" id="profileBadge">U</a>
+    <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    <span class="hamburger" id="hamburger">☰</span>
+  </div>
+</nav>
+
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+  <div class="close-btn" id="closeSidebar">✕</div>
+  <ul>
+    <li><a href="dashboard.html"><i class="fas fa-home"></i> Home</a></li>
+    <li><a href="market.html"><i class="fas fa-store"></i> Market</a></li>
+    <li><a href="about.html"><i class="fas fa-info-circle"></i> About</a></li>
+    <li><a href="profile.html"><i class="fas fa-user"></i> Profile</a></li>
+    <li><a href="favourites.html"><i class="fas fa-heart"></i> Favorites</a></li>
+    <li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+    <li><button id="sidebarDarkMode"><i class="fas fa-moon"></i> Dark Mode</button></li>
+    <li><button id="sidebarLogout"><i class="fas fa-sign-out-alt"></i> Logout</button></li>
+  </ul>
+</div>
+<div class="overlay" id="overlay"></div>
+
+<main class="container">
+  <a href="market.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Market</a>
+  <div id="productContainer"><!-- يُملأ ديناميكياً --></div>
+</main>
+
+<!-- ========== FOOTER ========== -->
+<footer class="simple-footer">
+  Copyright © 2026 Phoenix — <a href="about.html">About</a>
+</footer>
+
+<!-- Chatbot -->
+<div class="chatbot">
+  <div class="chat-circle" id="chatIcon"><img src="photo_2026-02-17_19-01-20.jpg" alt="AI"></div>
+  <span class="chat-label" id="chatLabel">Ask AI</span>
+  <div class="chat-box" id="chatBox">
+    <div class="chat-header"><h4><i class="fas fa-feather-alt"></i> Phoenix AI</h4><button class="close-chat" id="closeChatBtn">✕</button></div>
+    <div class="chat-messages" id="chatMessages"><div class="chat-message bot">👋 Hi! How can I help?</div></div>
+    <div class="chat-input-area"><textarea id="chatInput" placeholder="Type..."></textarea><button id="sendChat">Send</button></div>
+  </div>
+</div>
+
+<script>
+  (function(){
+    'use strict';
+
+    // ---------- دالة مضمونة للعثور على المنتج من جميع المصادر ----------
+    function findProductById(targetId) {
+      // 1. البحث في allProducts
+      const allProducts = JSON.parse(localStorage.getItem('allProducts') || '[]');
+      let product = allProducts.find(p => Number(p.id) === Number(targetId));
+      if (product) return product;
+
+      // 2. البحث في userProducts
+      const userProducts = JSON.parse(localStorage.getItem('userProducts') || '[]');
+      product = userProducts.find(p => Number(p.id) === Number(targetId));
+      if (product) return product;
+
+      // 3. البحث في favourites (احتياطي)
+      const favourites = JSON.parse(localStorage.getItem('favourites') || '[]');
+      product = favourites.find(p => Number(p.id) === Number(targetId));
+      if (product) return product;
+
+      // 4. إذا لم يوجد، أضف منتجًا افتراضيًا (لكن فقط إذا كان localStorage فارغًا بالكامل)
+      if (allProducts.length === 0 && userProducts.length === 0) {
+        const defaultProducts = [
+          { id:1, title:'MacBook Pro 16"', category:'electronics', condition:'New', price:2499, type:'sale', city:'Cairo', img:'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/mbp16-spacegray-select-202301?wid=904&hei=840&fmt=jpeg&qlt=90', description:'Brand new, M3 Max, 32GB RAM.', seller:{name:'Ahmed Hassan', rating:4.8} },
+          { id:2, title:'Sony WH-1000XM5', category:'electronics', condition:'Like New', price:299, type:'sale', city:'Alexandria', img:'https://m.media-amazon.com/images/I/61+btxzpfDL._AC_SL1500_.jpg', description:'Noise cancelling headphones.', seller:{name:'Chris P.', rating:4.9} },
+          { id:3, title:'Winter Coat', category:'clothes', condition:'Like New', price:0, type:'free', city:'Cairo', img:'https://images.unsplash.com/photo-1544022613-e8ca6d9e5b2a?w=400', description:'Warm coat, size M.', seller:{name:'Laila M.', rating:5.0} },
+          { id:4, title:'Kids Bicycle', category:'sports', condition:'Fair', price:0, type:'free', city:'Alexandria', img:'https://images.unsplash.com/photo-1576434320821-8a82c0b4c3a6?w=400', description:'Good for ages 5-7.', seller:{name:'Omar S.', rating:4.5} }
+        ];
+        localStorage.setItem('allProducts', JSON.stringify(defaultProducts));
+        return defaultProducts.find(p => p.id === targetId);
+      }
+      return null;
+    }
+
+    // عرض المنتج
+    function renderProduct(product) {
+      const container = document.getElementById('productContainer');
+      const isFree = product.type === 'free' || product.price === 0;
+      const priceDisplay = isFree ? 'Free' : `${product.price} EGP`;
+      const actionText = isFree ? 'Request Item' : 'Buy Now';
+      const mainImg = product.img || product.image || 'https://via.placeholder.com/600x400?text=No+Image';
+      const sellerName = product.seller?.name || product.user || 'Anonymous';
+      const sellerRating = product.seller?.rating || '4.5';
+
+      container.innerHTML = `
+        <div class="product-container">
+          <div class="product-gallery"><div class="main-image"><img src="${mainImg}" alt="${product.title}"></div></div>
+          <div class="product-info">
+            <h1>${product.title}</h1>
+            <div class="product-meta"><span class="badge"><i class="fas fa-tag"></i> ${product.category||'General'}</span><span class="condition-badge">${product.condition||'Good'}</span></div>
+            <div class="price-location"><span class="price">${priceDisplay}</span><span><i class="fas fa-map-marker-alt"></i> ${product.city||product.location||'Cairo'}</span></div>
+            <div class="description-section"><h3>Description</h3><p>${product.description||'No description.'}</p></div>
+            <div class="seller-card">
+              <div class="seller-avatar"><i class="fas fa-user-circle"></i></div>
+              <div><h4>${sellerName}</h4><span>⭐ ${sellerRating}</span></div>
+            </div>
+            <div class="action-buttons">
+              <button class="btn-primary" id="mainActionBtn"><i class="fas fa-${isFree?'hand-holding-heart':'shopping-cart'}"></i> ${actionText}</button>
+              <button class="btn-outline" id="chatSellerBtn"><i class="fas fa-comment"></i> Chat</button>
+              <button class="icon-btn" id="favouriteBtn"><i class="far fa-heart"></i></button>
+              <div class="share-wrapper">
+                <button class="icon-btn" id="shareBtn"><i class="fas fa-share-alt"></i></button>
+                <div class="share-dropdown" id="shareDropdown">
+                  <div class="share-option" id="copyLinkBtn"><i class="fas fa-link"></i> Copy Link</div>
+                  <a class="share-option" id="whatsappShare" href="#" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+                  <a class="share-option" id="facebookShare" href="#" target="_blank"><i class="fab fa-facebook"></i> Facebook</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // الأزرار
+      document.getElementById('mainActionBtn').addEventListener('click', ()=>{
+        if(isFree){
+          localStorage.setItem('chatContext', JSON.stringify({ productId: product.id, productTitle: product.title, owner: sellerName, type: 'donation' }));
+          window.location.href = `request_confirmation.html?id=${product.id}`;
+        } else {
+          window.location.href = `checkout.html?id=${product.id}`;
+        }
+      });
+
+      document.getElementById('chatSellerBtn').addEventListener('click', ()=>{
+        localStorage.setItem('chatContext', JSON.stringify({ productId: product.id, productTitle: product.title, seller: sellerName }));
+        window.location.href = `chat.html?seller=${encodeURIComponent(sellerName)}&product=${encodeURIComponent(product.title)}&productId=${product.id}`;
+      });
+
+      // المفضلة
+      const favBtn = document.getElementById('favouriteBtn');
+      let favourites = JSON.parse(localStorage.getItem('favourites')||'[]');
+      if(favourites.find(f=>f.id===product.id)){
+        favBtn.classList.add('liked');
+        favBtn.querySelector('i').classList.remove('far');
+        favBtn.querySelector('i').classList.add('fas');
+      }
+      favBtn.addEventListener('click', function(){
+        this.classList.toggle('liked');
+        const icon = this.querySelector('i');
+        icon.classList.toggle('far'); icon.classList.toggle('fas');
+        let favs = JSON.parse(localStorage.getItem('favourites')||'[]');
+        if(this.classList.contains('liked')){
+          if(!favs.find(f=>f.id===product.id)){
+            favs.push({ id:product.id, title:product.title, price:product.price, type:product.type, img:product.img||product.image, city:product.city });
+          }
+        } else {
+          favs = favs.filter(f=>f.id!==product.id);
+        }
+        localStorage.setItem('favourites', JSON.stringify(favs));
+      });
+
+      // مشاركة
+      const shareBtn = document.getElementById('shareBtn');
+      const shareDropdown = document.getElementById('shareDropdown');
+      shareBtn.addEventListener('click', (e)=>{ e.stopPropagation(); shareDropdown.classList.toggle('show'); });
+      document.addEventListener('click', (e)=>{ if(!e.target.closest('.share-wrapper')) shareDropdown.classList.remove('show'); });
+
+      const currentUrl = window.location.href;
+      document.getElementById('copyLinkBtn').addEventListener('click', ()=>{
+        navigator.clipboard?.writeText(currentUrl).then(()=> alert('Link copied!')).catch(()=> alert('Press Ctrl+C to copy'));
+        shareDropdown.classList.remove('show');
+      });
+      document.getElementById('whatsappShare').href = `https://wa.me/?text=${encodeURIComponent('Check out this item: '+product.title+' - '+currentUrl)}`;
+      document.getElementById('facebookShare').href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}`;
+    }
+
+    function renderError() {
+      document.getElementById('productContainer').innerHTML = `<div style="text-align:center;padding:3rem;"><i class="fas fa-box-open" style="font-size:3rem;"></i><h2>Product Not Found</h2><a href="market.html" class="btn-primary">Return to Market</a></div>`;
+    }
+
+    // تنفيذ العرض
+    const params = new URLSearchParams(location.search);
+    let id = params.get('id');
+    if(!id) renderError();
+    else {
+      id = Number(id);
+      const product = findProductById(id);
+      product ? renderProduct(product) : renderError();
+    }
+
+    // ---------- NAVBAR & UI ----------
+    const user = JSON.parse(localStorage.getItem('currentUser')) || { firstName:'U' };
+    document.getElementById('profileBadge').textContent = (user.firstName||'U').charAt(0).toUpperCase();
+
+    const themeToggle = document.getElementById('themeToggle');
+    const sidebarDarkBtn = document.getElementById('sidebarDarkMode');
+    function toggleDark() {
+      document.body.classList.toggle('dark');
+      const icon = themeToggle.querySelector('i');
+      if(document.body.classList.contains('dark')) {
+        icon.classList.remove('fa-moon'); icon.classList.add('fa-sun');
+        if(sidebarDarkBtn) sidebarDarkBtn.innerHTML = '<i class="fas fa-sun"></i> Dark Mode';
+      } else {
+        icon.classList.remove('fa-sun'); icon.classList.add('fa-moon');
+        if(sidebarDarkBtn) sidebarDarkBtn.innerHTML = '<i class="fas fa-moon"></i> Dark Mode';
+      }
+      localStorage.setItem('phoenix-theme', document.body.classList.contains('dark')?'dark':'light');
+    }
+    themeToggle.addEventListener('click', toggleDark);
+    if(sidebarDarkBtn) sidebarDarkBtn.addEventListener('click', toggleDark);
+    if(localStorage.getItem('phoenix-theme')==='dark') document.body.classList.add('dark');
+
+    // Sidebar
+    const hamburger = document.getElementById('hamburger');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    function openSidebar(){ sidebar.classList.add('open'); overlay.classList.add('active'); }
+    function closeSidebar(){ sidebar.classList.remove('open'); overlay.classList.remove('active'); }
+    hamburger.addEventListener('click', openSidebar);
+    document.getElementById('closeSidebar').addEventListener('click', closeSidebar);
+    overlay.addEventListener('click', closeSidebar);
+    function logout(){ if(confirm('Logout?')){ localStorage.removeItem('currentUser'); window.location.href='index.html'; } }
+    document.getElementById('logoutBtn').addEventListener('click', logout);
+    document.getElementById('sidebarLogout')?.addEventListener('click', logout);
+
+    // Dropdowns
+    let activeDropdown = null;
+    const notificationDropdown = document.createElement('div');
+    notificationDropdown.className = 'notification-dropdown';
+    notificationDropdown.innerHTML = `<div class="dropdown-header"><h3>Notifications</h3><button class="mark-read-btn">Mark all read</button></div><div class="notifications-list" id="notificationsList"></div><div class="dropdown-footer"><a href="#" id="viewAllNotificationsLink">View all</a></div>`;
+    document.body.appendChild(notificationDropdown);
+
+    const messageDropdown = document.createElement('div');
+    messageDropdown.className = 'message-dropdown';
+    messageDropdown.innerHTML = `<div class="dropdown-header"><h3>Messages</h3><button class="mark-read-btn">Mark all read</button></div><div class="messages-list" id="messagesList"></div><div class="dropdown-footer"><a href="#" id="viewAllMessagesLink">View all</a></div>`;
+    document.body.appendChild(messageDropdown);
+
+    const notifications = [
+      { id:1, type:'message', title:'New message', description:'Ahmed sent you a message', time:'2m ago', user:'Ahmed' },
+      { id:2, type:'donation', title:'Donation request', description:'Laila wants your coat', time:'1h ago', user:'Laila' }
+    ];
+    const messages = [
+      { id:1, sender:'Ahmed Hassan', avatar:'https://i.pravatar.cc/40?img=7', preview:'Hey, still available?', time:'2m ago', user:'Ahmed' },
+      { id:2, sender:'Laila M.', avatar:'https://i.pravatar.cc/40?img=5', preview:'Thanks!', time:'1h ago', user:'Laila' }
+    ];
+
+    function renderDropdowns() {
+      document.getElementById('notificationsList').innerHTML = notifications.map(n=>`<div class="notification-item" data-user="${n.user}"><div class="notification-icon"><i class="fas fa-${n.type==='message'?'envelope':'heart'}"></i></div><div class="notification-content"><div class="notification-title">${n.title}</div><div class="notification-desc">${n.description}</div><div class="notification-time">${n.time}</div></div></div>`).join('');
+      document.getElementById('messagesList').innerHTML = messages.map(m=>`<div class="message-item" data-user="${m.user}"><div class="message-avatar"><img src="${m.avatar}" onerror="this.src='https://i.pravatar.cc/40?u=${m.sender}'"></div><div class="message-content"><div class="message-sender">${m.sender}</div><div class="message-preview">${m.preview}</div><div class="message-time">${m.time}</div></div></div>`).join('');
+      document.querySelectorAll('.notification-item, .message-item').forEach(el=> el.addEventListener('click', ()=> window.location.href = `chat.html?user=${el.dataset.user}`));
+    }
+    renderDropdowns();
+    document.getElementById('viewAllNotificationsLink').addEventListener('click', e=>{ e.preventDefault(); window.location.href='notifications.html'; });
+    document.getElementById('viewAllMessagesLink').addEventListener('click', e=>{ e.preventDefault(); window.location.href='chat.html'; });
+
+    function closeAllDropdowns() {
+      notificationDropdown.classList.remove('show');
+      messageDropdown.classList.remove('show');
+      activeDropdown = null;
+    }
+    function openDropdown(type, iconEl) {
+      closeAllDropdowns();
+      const dropdown = type==='notification' ? notificationDropdown : messageDropdown;
+      const rect = iconEl.getBoundingClientRect();
+      dropdown.style.top = (rect.bottom + window.scrollY + 5) + 'px';
+      dropdown.style.right = (window.innerWidth - rect.right - window.scrollX) + 'px';
+      dropdown.classList.add('show');
+      activeDropdown = type;
+    }
+
+    document.getElementById('notificationBell').addEventListener('click', e=>{
+      e.stopPropagation();
+      activeDropdown==='notification' ? closeAllDropdowns() : openDropdown('notification', e.currentTarget);
+    });
+    document.getElementById('messageIcon').addEventListener('click', e=>{
+      e.stopPropagation();
+      activeDropdown==='message' ? closeAllDropdowns() : openDropdown('message', e.currentTarget);
+    });
+    document.addEventListener('click', e=>{
+      if(!e.target.closest('.notification-wrapper') && !e.target.closest('.notification-dropdown') &&
+         !e.target.closest('.message-wrapper') && !e.target.closest('.message-dropdown')) closeAllDropdowns();
+    });
+
+    // Chatbot
+    (function(){
+      const chatIcon = document.getElementById('chatIcon');
+      const chatBox = document.getElementById('chatBox');
+      const chatMessages = document.getElementById('chatMessages');
+      const chatInput = document.getElementById('chatInput');
+      const sendBtn = document.getElementById('sendChat');
+      chatIcon.addEventListener('click', ()=> chatBox.classList.toggle('show'));
+      document.getElementById('closeChatBtn').addEventListener('click', ()=> chatBox.classList.remove('show'));
+      function sendMsg(){
+        const msg = chatInput.value.trim();
+        if(!msg) return;
+        const div = document.createElement('div'); div.className = 'chat-message'; div.textContent = msg;
+        chatMessages.appendChild(div);
+        chatInput.value = '';
+        setTimeout(()=>{
+          const botDiv = document.createElement('div'); botDiv.className = 'chat-message bot'; botDiv.textContent = 'Thanks! 🔥';
+          chatMessages.appendChild(botDiv);
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+        }, 500);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+      sendBtn.addEventListener('click', sendMsg);
+      chatInput.addEventListener('keypress', e=>{ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); sendMsg(); } });
+    })();
+  })();
+</script>
+</body>
+</html>
